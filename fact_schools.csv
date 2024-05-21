@@ -1,0 +1,188 @@
+Index,School,School Type,Index Type,Primary Index
+0,Adams Elementary,E,P,0
+1,Alki Elementary,E,P,1
+2,Arbor Heights Elementary,E,P,2
+3,Daniel Bagley Elementary,E,P,3
+4,Beacon Hill International Elementary,E,P,4
+5,Bryant Elementary,E,P,5
+6,Cascadia Elementary,E,P,6
+7,Cedar Park Elementary,E,P,7
+8,Coe Elementary,E,P,8
+9,Concord International Elementary,E,P,9
+10,Benjamin Franklin Day Elementary,E,P,10
+11,Dearborn Park International Elementary,E,P,11
+12,Decatur Elementary,E,P,12
+13,Dunlap Elementary,E,P,13
+14,Emerson Elementary,E,P,14
+15,Fairmount Park Elementary,E,P,15
+16,Gatewood Elementary,E,P,16
+17,Bailey Gatzert Elementary,E,P,17
+18,Genesee Hill Elementary,E,P,18
+19,Graham Hill Elementary,E,P,19
+20,Green Lake Elementary,E,P,20
+21,Greenwood Elementary,E,P,21
+22,Hawthorne Elementary,E,P,22
+23,John Hay Elementary,E,P,23
+24,Highland Park Elementary,E,P,24
+25,Kimball Elementary,E,P,25
+26,"Martin Luther King, Jr. Elementary",E,P,26
+27,Lafayette Elementary,E,P,27
+28,Laurelhurst Elementary,E,P,28
+29,Lawton Elementary,E,P,29
+30,Leschi Elementary,E,P,30
+31,Lowell Elementary,E,P,31
+32,Loyal Heights Elementary,E,P,32
+33,Wing Luke Elementary,E,P,33
+34,Madrona Elementary,E,P,34
+35,Magnolia Elementary,E,P,35
+36,Maple Elementary,E,P,36
+37,Thurgood Marshall Elementary,E,P,37
+38,McDonald International Elementary,E,P,38
+39,McGilvra Elementary,E,P,39
+40,Montlake Elementary,E,P,40
+41,John Muir Elementary,E,P,41
+42,North Beach Elementary,E,P,42
+43,James Baldwin Elementary,E,P,43
+44,Olympic Hills Elementary,E,P,44
+45,Olympic View Elementary,E,P,45
+46,Queen Anne Elementary,E,P,46
+47,Rainier View Elementary,E,P,47
+48,Rising Star Elementary,E,P,48
+49,John Rogers Elementary,E,P,49
+50,Roxhill Elementary,E,P,50
+51,Sacajawea Elementary,E,P,51
+52,Sand Point Elementary,E,P,52
+53,Sanislo Elementary,E,P,53
+54,John Stanford International Elementary,E,P,54
+55,Stevens Elementary,E,P,55
+56,Thornton Creek Elementary,E,P,56
+57,View Ridge Elementary,E,P,57
+58,Viewlands Elementary,E,P,58
+59,Wedgwood Elementary,E,P,59
+60,West Seattle Elementary,E,P,60
+61,West Woodland Elementary,E,P,61
+62,Blaine,K-8,P,62
+63,Louisa Boren (STEM),K-8,P,63
+64,Broadview-Thomson,K-8,P,64
+65,Pathfinder/Cooper,K-8,P,65
+66,Hazel Wolf,K-8,P,66
+67,Monroe/Salmon Bay,K-8,P,67
+68,TOPS/Seward,K-8,P,68
+69,Orca/Whitworth,K-8,P,69
+70,South Shore,K-8,P,70
+71,Licton Springs/Webster,K-8,P,71
+72,Aki Kurose,M,P,72
+73,David T. Denny International,M,P,73
+74,Eckstein,M,P,74
+75,Hamilton International,M,P,75
+76,Jane Addams,M,P,76
+77,Madison,M,P,77
+78,McClure,M,P,78
+79,Meany,M,P,79
+80,Mercer International,M,P,80
+81,Robert Eagle Staff,M,P,81
+82,Washington,M,P,82
+83,Whitman,M,P,83
+84,Ballard,H,P,84
+85,Chief Sealth International,H,P,85
+86,Center School,H,P,86
+87,Cleveland,H,P,87
+88,Franklin,H,P,88
+89,Garfield,H,P,89
+90,Ingraham,H,P,90
+91,Lincoln,H,P,91
+92,Nathan Hale,H,P,92
+93,Rainier Beach,H,P,93
+94,Roosevelt,H,P,94
+95,Alan T. Sugiyama at South Lake,H,P,95
+96,West Seattle High School,H,P,96
+97,CPPP/North Queen Anne,S,P,97
+98,Interagency/Columbia,S,P,98
+99,Nova Alternative/Horace Mann,S,P,99
+100,B.F. Day Elementary,E,aka,10
+101,Beacon Hill International School,E,aka,4
+102,Concord International School,E,aka,9
+103,Dearborn Park International School,E,aka,11
+104,Fairmont Park Elementary,E,aka,15
+105,Franz Coe Elementary,E,aka,8
+106,Hawthorne,E,aka,22
+107,John Hay,E,aka,23
+108,John Stanford Intl,E,aka,54
+109,Loyal Heights,E,aka,32
+110,Madrona K-5,E,aka,34
+111,Magnolia,E,aka,35
+112,Maple,E,aka,36
+113,Martin Luther King Jr,E,aka,26
+114,McDonald Intl.,E,aka,38
+115,McGilvra,E,aka,39
+116,Montlake,E,aka,40
+117,North Beach,E,aka,42
+118,Northgate,E,aka,43
+119,Olympic Hills,E,aka,44
+120,Olympic View,E,aka,45
+121,Queen Anne,E,aka,46
+122,Rainier View,E,aka,47
+123,Rising Star Academy,E,aka,48
+124,Roxhill,E,aka,50
+125,Sacajawea,E,aka,51
+126,Sand Point,E,aka,52
+127,Sanislo,E,aka,53
+128,Stevens,E,aka,55
+129,Thornton Creek,E,aka,56
+130,Thurgood Marshall,E,aka,37
+131,View Ridge,E,aka,57
+132,Viewlands,E,aka,58
+133,Wedgwood,E,aka,59
+134,West Seattle,E,aka,60
+135,West Woodland,E,aka,61
+136,Whittier Elementary,E,P,136
+137,Wing Luke,E,aka,33
+138,Alki,E,aka,1
+139,Arbor Heights,E,aka,2
+140,B.F. Day,E,aka,10
+141,Daniel Bagley,E,aka,3
+142,Beacon Hill International,E,aka,4
+143,Bryant,E,aka,5
+144,Cascadia,E,aka,6
+145,Cedar Park,E,aka,7
+146,Frantz Coe,E,aka,8
+147,Concord International,E,aka,9
+148,Dearborn Park International,E,aka,11
+149,Decatur,E,aka,12
+150,Dunlap,E,aka,13
+151,Emerson,E,aka,14
+152,Fairmount Park,E,aka,15
+153,Gatewood,E,aka,16
+154,Bailey Gatzert,E,aka,17
+155,Genesee Hill,E,aka,18
+156,Graham Hill,E,aka,19
+157,Green Lake,E,aka,20
+158,Greenwood,E,aka,21
+159,Highland Park,E,aka,24
+160,John Stanford International/Latona,E,aka,54
+161,Kimball,E,aka,25
+162,Lafayette,E,aka,27
+163,Laurelhurst,E,aka,28
+164,Lawton,E,aka,29
+165,Leschi,E,aka,30
+166,Lowell,E,aka,31
+167,Martin Luther King Jr.,E,aka,26
+168,Madrona,E,aka,34
+169,McDonald International,E,aka,38
+170,John Muir,E,aka,41
+171,Rising Star/African American Academy,E,aka,48
+172,John Rogers,E,aka,49
+173,Roxhill/E. C. Hughes,E,aka,50
+174,West Seattle ES,E,aka,60
+175,Van Asselt Elementary School,E,aka,48
+176,South Lake High School,H,aka,95
+177,Whittier,E,aka,136
+178,Cascadia Elementrary,E,aka,6
+179,John Stanford Elementary,E,aka,54
+180,Northgate Elementary,E,aka,43
+181,McDonald Intl. Elementary,E,aka,38
+182,Genesse Hill Elementary,E,aka,18
+183,Dearborn Park Intl. Elementary,E,aka,11
+184,Concord Intl. Elementary,E,aka,9
+185,Beacon Hill Intl. Elementary,E,aka,4
+186,Adams,E,aka,0
