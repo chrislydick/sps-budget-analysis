@@ -6,7 +6,7 @@ import folium
 from streamlit_folium import st_folium
 
 # Load data
-data = pd.read_csv('performance_data_2023.csv')
+data = pd.read_csv('data/performance_data_2023.csv')
 
 # Clean data
 data = data.rename(columns=lambda x: x.strip()).drop(columns=['Unnamed: 0'])
