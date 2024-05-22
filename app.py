@@ -1,8 +1,9 @@
-#Streamlit App - Beta and draft
-
+# Save this as app.py
 import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
+import folium
+from streamlit_folium import st_folium
 
 # Load data
 data = pd.read_csv('performance_data_2023.csv')
@@ -14,6 +15,9 @@ data['Budget Efficiency'] = data['Total Budget (BUDGET)'] / data['Total AAFTE* E
 data['Landmark'] = data['Landmark'].fillna('N')
 data['Landmark'] = data['Landmark'].replace({'None': 'N', 'NA': 'N'})
 
+# Rename latitude and longitude columns to lowercase
+data = data.rename(columns={'Latitude': 'latitude', 'Longitude': 'longitude'})
+
 # Title
 st.title('Seattle Elementary Schools Budget Analysis')
 
@@ -21,7 +25,7 @@ st.title('Seattle Elementary Schools Budget Analysis')
 st.sidebar.header('Filter options')
 
 # Landmark status filter
-landmark_options = ['N', 'Y','P']
+landmark_options = ['Y', 'N', 'P']
 selected_landmark = st.sidebar.multiselect('Select Landmark Status', options=landmark_options, default=landmark_options)
 
 # Budget range filter using sliders
@@ -69,7 +73,29 @@ filtered_data = data[(data['Landmark'].isin(selected_landmark)) &
 
 # Main panel
 st.subheader(f'Filtered Data: ({filtered_data.shape[0]})')
-st.write(filtered_data)
+if st.checkbox('Transpose Data', value=False): 
+    st.write(filtered_data.transpose())
+else: 
+    st.write(filtered_data) 
+
+
+# Map of school locations with different colors for filtered and non-filtered schools
+st.subheader('Map of School Locations')
+
+# Create a map centered around Seattle with a dark base map
+m = folium.Map(location=[filtered_data['latitude'].mean(), filtered_data['longitude'].mean()], zoom_start=11, tiles='CartoDB dark_matter')
+
+# Add all schools to the map with different colors
+for _, row in data.iterrows():
+    color = 'red' if row['School'] in filtered_data['School'].values else 'gray'
+    folium.Marker(
+        location=[row['latitude'], row['longitude']],
+        popup=row['School'],
+        icon=folium.Icon(color=color)
+    ).add_to(m)
+
+# Display the map
+st_folium(m, width=700, height=500)
 
 # Plotting
 st.subheader('Budget Efficiency Distribution')
@@ -96,3 +122,5 @@ ax.set_xlabel(x_dimension)
 ax.set_ylabel(y_dimension)
 ax.legend()
 st.pyplot(fig)
+
+
