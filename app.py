@@ -47,7 +47,7 @@ columns = data.columns.tolist()
 columns = [columns[-1]] + columns[:-1]
 data = data[columns]
 
-# Rename latitude and longitude columns to lowercase
+# Rename latitude and longitude columns to lowercase due to nuances with folium
 data = data.rename(columns={'Latitude': 'latitude', 'Longitude': 'longitude'})
 
 # Title
