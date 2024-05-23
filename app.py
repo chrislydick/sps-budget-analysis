@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 import folium
 from streamlit_folium import st_folium
 
+
 # Load data
 data = pd.read_csv('data/performance_data_2023.csv')
 
@@ -14,6 +15,15 @@ data['Necessary Budget'] = 500000 + data['Total Budget (BUDGET)']
 data['Budget Efficiency'] = data['Total Budget (BUDGET)'] / data['Total AAFTE* Enrollment (ENROLLMENT)']
 data['Landmark'] = data['Landmark'].fillna('N')
 data['Landmark'] = data['Landmark'].replace({'None': 'N', 'NA': 'N'})
+data['In Filter'] = True
+data.drop(columns='Year', inplace=True)
+
+                                    
+
+# Move the rightmost column to the leftmost position
+columns = data.columns.tolist()
+columns = [columns[-1]] + columns[:-1]
+data = data[columns]
 
 # Rename latitude and longitude columns to lowercase
 data = data.rename(columns={'Latitude': 'latitude', 'Longitude': 'longitude'})
@@ -27,6 +37,7 @@ st.sidebar.header('Filter options')
 # Landmark status filter
 landmark_options = ['Y', 'N', 'P']
 selected_landmark = st.sidebar.multiselect('Select Landmark Status', options=landmark_options, default=landmark_options)
+
 
 # Budget range filter using sliders
 budget_range = st.sidebar.slider('Select Total Budget Range', 
@@ -69,14 +80,36 @@ filtered_data = data[(data['Landmark'].isin(selected_landmark)) &
                      (data['Disadvantage Score'] >= disadvantage_score_range[0]) &
                      (data['Disadvantage Score'] <= disadvantage_score_range[1]) &
                      (data['Total AAFTE* Enrollment (ENROLLMENT)'] >= enrollment_range[0]) & 
-                     (data['Total AAFTE* Enrollment (ENROLLMENT)'] <= enrollment_range[1])]
+                     (data['Total AAFTE* Enrollment (ENROLLMENT)'] <= enrollment_range[1]) & 
+                     (data['In Filter'] == True)
+]
+
+
+
+
 
 # Main panel
 st.subheader(f'Filtered Data: ({filtered_data.shape[0]})')
-if st.checkbox('Transpose Data', value=False): 
-    st.write(filtered_data.transpose())
-else: 
-    st.write(filtered_data) 
+
+
+data['In Filter'] = data['School'].isin(filtered_data['School'])
+filtered_data = data[(data['Landmark'].isin(selected_landmark)) &
+    (data['Total Budget (BUDGET)'] >= budget_range[0]) & 
+    (data['Total Budget (BUDGET)'] <= budget_range[1]) & 
+    (data['Excess Budget per Student'] >= excess_budget_range[0]) &
+    (data['Excess Budget per Student'] <= excess_budget_range[1]) &
+    (data['Budget Efficiency'] >= budget_efficiency_range[0]) &
+    (data['Budget Efficiency'] <= budget_efficiency_range[1]) &
+    (data['Disadvantage Score'] >= disadvantage_score_range[0]) &
+    (data['Disadvantage Score'] <= disadvantage_score_range[1]) &
+    (data['Total AAFTE* Enrollment (ENROLLMENT)'] >= enrollment_range[0]) & 
+    (data['Total AAFTE* Enrollment (ENROLLMENT)'] <= enrollment_range[1]) &
+    (data['In Filter'] == True)]
+st.data_editor(data) 
+
+
+
+
 
 
 # Map of school locations with different colors for filtered and non-filtered schools
@@ -98,16 +131,17 @@ for _, row in data.iterrows():
 st_folium(m, width=700, height=500)
 
 # Plotting
-st.subheader('Budget Efficiency Distribution')
+###st.subheader('Budget Efficiency Distribution')
 fig, ax = plt.subplots()
-ax.hist(filtered_data['Budget Efficiency'], bins=20, color='skyblue', edgecolor='black')
+ax.hist(filtered_data['Budget Efficiency'], bins=20, color='#FF4B4B', edgecolor='black')
+ax.set_facecolor('#0B0B0BFF')
 ax.set_title('Distribution of Budget Efficiency of Schools')
 ax.set_xlabel('Budget Efficiency (Budget per Student)')
 ax.set_ylabel('Number of Schools')
-st.pyplot(fig)
+###st.pyplot(fig)
 
 # Scatter plot of two selected dimensions
-st.subheader('2D Scatter Plot of Selected Dimensions')
+###st.subheader('2D Scatter Plot of Selected Dimensions')
 
 # Dropdown menus for selecting dimensions
 x_dimension = st.selectbox('Select X Dimension', options=data.columns, index=data.columns.get_loc('Total Budget (BUDGET)'))
@@ -121,6 +155,12 @@ ax.set_title(f'Scatter Plot of {x_dimension} vs {y_dimension}')
 ax.set_xlabel(x_dimension)
 ax.set_ylabel(y_dimension)
 ax.legend()
-st.pyplot(fig)
+###st.pyplot(fig)
+
+st.subheader("Filtered Data:")
+st.dataframe(filtered_data)
+
+st.subheader("All Data:")
+st.dataframe(data)
 
 
