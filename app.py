@@ -55,7 +55,7 @@ data = data.rename(columns={'Latitude': 'latitude', 'Longitude': 'longitude'})
 st.title('Seattle Elementary Schools Budget Analysis')
 
 # Sidebar for filtering
-st.sidebar.header('Filter options')
+st.sidebar.header('Apply the Filter to identify Schools to Close...')
 
 color_options = ['red', 'blue', 'green', 'purple', 'orange', 'darkred', 'lightred', 'beige',
                  'darkblue', 'darkgreen', 'cadetblue', 'darkpurple', 'white', 'pink',
@@ -101,7 +101,7 @@ enrollment_range = st.sidebar.slider('Select Total AAFTE Enrollment Range',
 capacity = st.sidebar.slider('Select Total Capacity Percent Range', 
                                      min_value=float(data['Capacity Percent'].min()), 
                                      max_value=float(data['Capacity Percent'].max()), 
-                                     value=(float(data['Capacity Percent'].min()), float(data['Capacity Percent'].max())))
+                                     value=(0.0, 0.65))
 
 low_range_color = st.sidebar.selectbox('Capacity Low Range Color (< 75%)', color_options, index=color_options.index('lightgreen'))
 mid_range_color = st.sidebar.selectbox('Capacity Mid Range Color (75% - 95%)', color_options, index=color_options.index('green'))
