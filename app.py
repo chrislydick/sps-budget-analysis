@@ -6,6 +6,15 @@ import folium
 from streamlit_folium import st_folium
 
 
+def determine_color(capacity_percent):
+    if float(capacity_percent) < 0.75:
+        return 'lightgreen'
+    elif float(capacity_percent) < 0.95 and float(capacity_percent) >= 0.75:
+        return 'green'
+    else:
+        return 'darkgreen'
+
+
 # Load data
 data = pd.read_csv('data/performance_data_2023.csv')
 
@@ -69,6 +78,13 @@ enrollment_range = st.sidebar.slider('Select Total AAFTE Enrollment Range',
                                      max_value=int(data['Total AAFTE* Enrollment (ENROLLMENT)'].max()), 
                                      value=(int(data['Total AAFTE* Enrollment (ENROLLMENT)'].min()), int(data['Total AAFTE* Enrollment (ENROLLMENT)'].max())))
 
+# School Capacity range filter using sliders
+capacity = st.sidebar.slider('Select Total Capacity Percent Range', 
+                                     min_value=float(data['Capacity Percent'].min()), 
+                                     max_value=float(data['Capacity Percent'].max()), 
+                                     value=(float(data['Capacity Percent'].min()), float(data['Capacity Percent'].max())))
+
+
 # Apply filters
 filtered_data = data[(data['Landmark'].isin(selected_landmark)) &
                      (data['Total Budget (BUDGET)'] >= budget_range[0]) & 
@@ -81,6 +97,8 @@ filtered_data = data[(data['Landmark'].isin(selected_landmark)) &
                      (data['Disadvantage Score'] <= disadvantage_score_range[1]) &
                      (data['Total AAFTE* Enrollment (ENROLLMENT)'] >= enrollment_range[0]) & 
                      (data['Total AAFTE* Enrollment (ENROLLMENT)'] <= enrollment_range[1]) & 
+                     (data['Capacity Percent'] >= capacity[0]) & 
+                     (data['Capacity Percent'] <= capacity[1]) & 
                      (data['In Filter'] == True)
 ]
 
@@ -104,8 +122,10 @@ filtered_data = data[(data['Landmark'].isin(selected_landmark)) &
     (data['Disadvantage Score'] <= disadvantage_score_range[1]) &
     (data['Total AAFTE* Enrollment (ENROLLMENT)'] >= enrollment_range[0]) & 
     (data['Total AAFTE* Enrollment (ENROLLMENT)'] <= enrollment_range[1]) &
+    (data['Capacity Percent'] >= capacity[0]) & 
+    (data['Capacity Percent'] <= capacity[1]) & 
     (data['In Filter'] == True)]
-st.data_editor(data) 
+t1 = st.data_editor(data) 
 
 
 
@@ -120,12 +140,13 @@ m = folium.Map(location=[filtered_data['latitude'].mean(), filtered_data['longit
 
 # Add all schools to the map with different colors
 for _, row in data.iterrows():
-    color = 'red' if row['School'] in filtered_data['School'].values else 'gray'
+    color = 'black' if row['School'] in filtered_data['School'].values else determine_color(row['Capacity Percent'])
     folium.Marker(
         location=[row['latitude'], row['longitude']],
         popup=row['School'],
         icon=folium.Icon(color=color)
     ).add_to(m)
+
 
 # Display the map
 st_folium(m, width=700, height=500)
