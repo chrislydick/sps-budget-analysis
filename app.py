@@ -8,11 +8,11 @@ from streamlit_folium import st_folium
 
 def determine_color(capacity_percent):
     if float(capacity_percent) < 0.75:
-        return 'lightgreen'
+        return low_range_color
     elif float(capacity_percent) < 0.95 and float(capacity_percent) >= 0.75:
-        return 'green'
+        return mid_range_color
     else:
-        return 'darkgreen'
+        return high_range_color
 
 
 # Load data
@@ -42,6 +42,11 @@ st.title('Seattle Elementary Schools Budget Analysis')
 
 # Sidebar for filtering
 st.sidebar.header('Filter options')
+
+color_options = ['red', 'blue', 'green', 'purple', 'orange', 'darkred', 'lightred', 'beige',
+                 'darkblue', 'darkgreen', 'cadetblue', 'darkpurple', 'white', 'pink',
+                 'lightblue', 'lightgreen', 'gray', 'black', 'lightgray']
+
 
 # Landmark status filter
 landmark_options = ['Y', 'N', 'P']
@@ -84,6 +89,10 @@ capacity = st.sidebar.slider('Select Total Capacity Percent Range',
                                      max_value=float(data['Capacity Percent'].max()), 
                                      value=(float(data['Capacity Percent'].min()), float(data['Capacity Percent'].max())))
 
+low_range_color = st.sidebar.selectbox('Capacity Low Range Color (< 75%)', color_options, index=color_options.index('lightgreen'))
+mid_range_color = st.sidebar.selectbox('Capacity Mid Range Color (75% - 95%)', color_options, index=color_options.index('green'))
+high_range_color = st.sidebar.selectbox('Capacity High Range Color (> 95%)', color_options, index=color_options.index('darkgreen'))
+closed_school_color = st.sidebar.selectbox('Closed School Color', color_options, index=color_options.index('black'))
 
 # Apply filters
 filtered_data = data[(data['Landmark'].isin(selected_landmark)) &
@@ -140,7 +149,7 @@ m = folium.Map(location=[filtered_data['latitude'].mean(), filtered_data['longit
 
 # Add all schools to the map with different colors
 for _, row in data.iterrows():
-    color = 'black' if row['School'] in filtered_data['School'].values else determine_color(row['Capacity Percent'])
+    color = closed_school_color if row['School'] in filtered_data['School'].values else determine_color(row['Capacity Percent'])
     folium.Marker(
         location=[row['latitude'], row['longitude']],
         popup=row['School'],
