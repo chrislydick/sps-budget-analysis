@@ -13,6 +13,20 @@ def determine_color(capacity_percent):
         return mid_range_color
     else:
         return high_range_color
+    
+def sync_dataframes(df1, df2, column_name):
+    # Ensure the column exists in both dataframes
+    if column_name not in df1.columns or column_name not in df2.columns:
+        raise ValueError(f"Column '{column_name}' not found in both dataframes.")
+    
+    # Iterate over the rows of the second dataframe
+    for idx, row in df2.iterrows():
+        if idx in df1.index:
+            df1.at[idx, column_name] = row[column_name]
+        else:
+            df1.loc[idx] = row
+    
+    return df1
 
 
 # Load data
@@ -134,9 +148,25 @@ filtered_data = data[(data['Landmark'].isin(selected_landmark)) &
     (data['Capacity Percent'] >= capacity[0]) & 
     (data['Capacity Percent'] <= capacity[1]) & 
     (data['In Filter'] == True)]
-t1 = st.data_editor(data) 
+t1 = st.data_editor(data[['In Filter','School', 'Total AAFTE* Enrollment (ENROLLMENT)','Predicted Total Budget (BUDGET)','Total Budget (BUDGET)','Excess Budget per Student','Capacity','Capacity Percent']]) 
+
+sync_dataframes(data, t1, 'In Filter')
 
 
+filtered_data = data[(data['Landmark'].isin(selected_landmark)) &
+    (data['Total Budget (BUDGET)'] >= budget_range[0]) & 
+    (data['Total Budget (BUDGET)'] <= budget_range[1]) & 
+    (data['Excess Budget per Student'] >= excess_budget_range[0]) &
+    (data['Excess Budget per Student'] <= excess_budget_range[1]) &
+    (data['Budget Efficiency'] >= budget_efficiency_range[0]) &
+    (data['Budget Efficiency'] <= budget_efficiency_range[1]) &
+    (data['Disadvantage Score'] >= disadvantage_score_range[0]) &
+    (data['Disadvantage Score'] <= disadvantage_score_range[1]) &
+    (data['Total AAFTE* Enrollment (ENROLLMENT)'] >= enrollment_range[0]) & 
+    (data['Total AAFTE* Enrollment (ENROLLMENT)'] <= enrollment_range[1]) &
+    (data['Capacity Percent'] >= capacity[0]) & 
+    (data['Capacity Percent'] <= capacity[1]) & 
+    (data['In Filter'] == True)]
 
 
 
@@ -187,8 +217,6 @@ ax.set_ylabel(y_dimension)
 ax.legend()
 ###st.pyplot(fig)
 
-st.subheader("Filtered Data:")
-st.dataframe(filtered_data)
 
 st.subheader("All Data:")
 st.dataframe(data)
