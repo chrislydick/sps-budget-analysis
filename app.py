@@ -68,9 +68,9 @@ selected_landmark = st.sidebar.multiselect('Select Landmark Status', options=lan
 
 # Budget range filter using sliders
 budget_range = st.sidebar.slider('Select Total Budget Range', 
-                                 min_value=int(data['Total Budget (BUDGET)'].min()), 
+                                 min_value=0, 
                                  max_value=int(data['Total Budget (BUDGET)'].max()), 
-                                 value=(int(data['Total Budget (BUDGET)'].min()), int(data['Total Budget (BUDGET)'].max())))
+                                 value=(0, int(data['Total Budget (BUDGET)'].max())))
 
 # Excess Budget per Student filter using sliders
 excess_budget_range = st.sidebar.slider('Select Excess Budget per Student Range', 
@@ -86,19 +86,19 @@ budget_efficiency_range = st.sidebar.slider('Select Budget Efficiency Range',
 
 # Disadvantage Score filter using sliders
 disadvantage_score_range = st.sidebar.slider('Select Disadvantage Score Range', 
-                                             min_value=float(data['Disadvantage Score'].min()), 
+                                             min_value=0.0, 
                                              max_value=float(data['Disadvantage Score'].max()), 
-                                             value=(float(data['Disadvantage Score'].min()), float(data['Disadvantage Score'].max())))
+                                             value=(0.0, float(data['Disadvantage Score'].max())))
 
 # Total AAFTE Enrollment range filter using sliders
 enrollment_range = st.sidebar.slider('Select Total AAFTE Enrollment Range', 
-                                     min_value=int(data['Total AAFTE* Enrollment (ENROLLMENT)'].min()), 
+                                     min_value=0, 
                                      max_value=int(data['Total AAFTE* Enrollment (ENROLLMENT)'].max()), 
-                                     value=(int(data['Total AAFTE* Enrollment (ENROLLMENT)'].min()), int(data['Total AAFTE* Enrollment (ENROLLMENT)'].max())))
+                                     value=(0,300))
 
 # School Capacity range filter using sliders
 capacity = st.sidebar.slider('Select Total Capacity Percent Range', 
-                                     min_value=float(data['Capacity Percent'].min()), 
+                                     min_value=0.0, 
                                      max_value=float(data['Capacity Percent'].max()), 
                                      value=(0.0, 0.65))
 
