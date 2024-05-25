@@ -61,8 +61,6 @@ st.sidebar.header('Which schools do you want to simulate closing?...')
 selected_options =  st.sidebar.multiselect("Metrics to Find Schools to Close...",
         ['School Budget', 'Excess Budget per Student', 'Budget Efficiency', 'Disadvantage Score','Enrollment Toal', 'Capacity Total','School Landmark Status'], ['Enrollment Toal', 'Capacity Total'])
 
-st.write('School budget?', 'School Budget' in selected_options)
-
 color_options = ['red', 'blue', 'green', 'purple', 'orange', 'darkred', 'lightred', 'beige',
                  'darkblue', 'darkgreen', 'cadetblue', 'darkpurple', 'white', 'pink',
                  'lightblue', 'lightgreen', 'gray', 'black', 'lightgray']
@@ -80,7 +78,7 @@ if 'School Budget' in selected_options:
     budget_range = st.sidebar.slider('Select Total Budget Range', 
                                  min_value=0, 
                                  max_value=int(data['Total Budget (BUDGET)'].max()), 
-                                 value=(0, int(data['Total Budget (BUDGET)'].max())))
+                                 value=(0, int(data['Total Budget (BUDGET)'].max())),format='$%d')
 else:
     budget_range = (0, int(data['Total Budget (BUDGET)'].max()))
 
@@ -89,7 +87,7 @@ if 'Excess Budget per Student' in selected_options:
     excess_budget_range = st.sidebar.slider('Select Excess Budget per Student Range', 
                                         min_value=float(data['Excess Budget per Student'].min()), 
                                         max_value=float(data['Excess Budget per Student'].max()), 
-                                        value=(float(data['Excess Budget per Student'].min()), float(data['Excess Budget per Student'].max())))
+                                        value=(float(data['Excess Budget per Student'].min()), float(data['Excess Budget per Student'].max())),format='$%d')
 else:
     excess_budget_range = (float(data['Excess Budget per Student'].min()), float(data['Excess Budget per Student'].max()))
 
@@ -98,7 +96,7 @@ if 'Budget Efficiency' in selected_options:
     budget_efficiency_range = st.sidebar.slider('Select Budget Efficiency Range', 
                                             min_value=float(data['Budget Efficiency'].min()), 
                                             max_value=float(data['Budget Efficiency'].max()), 
-                                            value=(float(data['Budget Efficiency'].min()), float(data['Budget Efficiency'].max())))
+                                            value=(float(data['Budget Efficiency'].min()), float(data['Budget Efficiency'].max())),format='$%d')
 else:
     budget_efficiency_range = (float(data['Budget Efficiency'].min()), float(data['Budget Efficiency'].max()))
 
@@ -117,17 +115,18 @@ if 'Enrollment Toal' in selected_options:
     enrollment_range = st.sidebar.slider('Select Total AAFTE Enrollment Range', 
                                      min_value=0, 
                                      max_value=int(data['Total AAFTE* Enrollment (ENROLLMENT)'].max()), 
-                                     value=(0,300))
+                                     value=(0,300),format='%i')
 else:
     enrollment_range = (0, int(data['Total AAFTE* Enrollment (ENROLLMENT)'].max()))
 
 
 # School Capacity range filter using sliders
 if 'Capacity Total' in selected_options:
-    capacity = st.sidebar.slider('Select Total Capacity Percent Range', 
+    capacity = st.sidebar.slider('Select Total School Capacity Percent Range', 
                                      min_value=0.0, 
-                                     max_value=float(data['Capacity Percent'].max()), 
-                                     value=(0.0, 0.65))
+                                     max_value=float(data['Capacity Percent'].max()*100.0), 
+                                     value=(0.0, 65.0), format='%i%%')
+    capacity = tuple(element / 100.0 for element in capacity)
 else:
     capacity = (0.0, float(data['Capacity Percent'].max()))
 
@@ -200,7 +199,10 @@ filtered_data = data[(data['Landmark'].isin(selected_landmark)) &
 st.subheader('Map of School Locations')
 
 # Create a map centered around Seattle with a dark base map
-m = folium.Map(location=[filtered_data['latitude'].mean(), filtered_data['longitude'].mean()], zoom_start=11, tiles='CartoDB dark_matter')
+try: 
+    m = folium.Map(location=[filtered_data['latitude'].mean(), filtered_data['longitude'].mean()], zoom_start=11, tiles='CartoDB dark_matter')
+except:
+    m = folium.Map(location=[data['latitude'].mean(), data['longitude'].mean()], zoom_start=11, tiles='CartoDB dark_matter')
 
 
 #low_range_color = st.selectbox('Capacity Low Range Color (< 75%)', color_options, index=color_options.index('lightgreen'))
@@ -214,17 +216,23 @@ closed_school_color = 'black'
 
 
 # Add all schools to the map with different colors
-for _, row in data.iterrows():
-    color = closed_school_color if row['School'] in filtered_data['School'].values else determine_color(row['Capacity Percent'])
-    folium.Marker(
-        location=[row['latitude'], row['longitude']],
-        popup=row['School'],
-        icon=folium.Icon(color=color)
-    ).add_to(m)
+try:
+    for _, row in data.iterrows():
+        color = closed_school_color if row['School'] in filtered_data['School'].values else determine_color(row['Capacity Percent'])
+        folium.Marker(
+            location=[row['latitude'], row['longitude']],
+            popup=row['School'],
+            icon=folium.Icon(color=color)
+        ).add_to(m)
+except:
+    st.write("")
 
 
 # Display the map
-st_folium(m, width=700, height=500)
+try: 
+    st_folium(m, width=700, height=500)
+except:
+    st.write("")
 
 # Plotting
 ###st.subheader('Budget Efficiency Distribution')
