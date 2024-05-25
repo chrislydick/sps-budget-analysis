@@ -37,7 +37,7 @@ data['Necessary Budget'] = 500000 + data['Total Budget (BUDGET)']
 data['Budget Efficiency'] = data['Total Budget (BUDGET)'] / data['Total AAFTE* Enrollment (ENROLLMENT)']
 data['Landmark'] = data['Landmark'].fillna('N')
 data['Landmark'] = data['Landmark'].replace({'None': 'N', 'NA': 'N'})
-data['In Filter'] = True
+data['Simulate Closing'] = True
 data.drop(columns='Year', inplace=True)
 
                                     
@@ -54,7 +54,14 @@ data = data.rename(columns={'Latitude': 'latitude', 'Longitude': 'longitude'})
 st.title('Seattle Elementary Schools Budget Analysis')
 
 # Sidebar for filtering
-st.sidebar.header('Apply the Filter to identify Schools to Close...')
+st.sidebar.header('Which schools do you want to simulate closing?...')
+
+ 
+
+selected_options =  st.sidebar.multiselect("Metrics to Find Schools to Close...",
+        ['School Budget', 'Excess Budget per Student', 'Budget Efficiency', 'Disadvantage Score','Enrollment Toal', 'Capacity Total','School Landmark Status'], ['Enrollment Toal', 'Capacity Total'])
+
+st.write('School budget?', 'School Budget' in selected_options)
 
 color_options = ['red', 'blue', 'green', 'purple', 'orange', 'darkred', 'lightred', 'beige',
                  'darkblue', 'darkgreen', 'cadetblue', 'darkpurple', 'white', 'pink',
@@ -63,49 +70,68 @@ color_options = ['red', 'blue', 'green', 'purple', 'orange', 'darkred', 'lightre
 
 # Landmark status filter
 landmark_options = ['Y', 'N', 'P']
-selected_landmark = st.sidebar.multiselect('Select Landmark Status', options=landmark_options, default=landmark_options)
-
+if 'School Landmark Status' in selected_options:
+    selected_landmark = st.sidebar.multiselect('Select Landmark Status', options=landmark_options, default=landmark_options)
+else:
+    selected_landmark = landmark_options
 
 # Budget range filter using sliders
-budget_range = st.sidebar.slider('Select Total Budget Range', 
+if 'School Budget' in selected_options:
+    budget_range = st.sidebar.slider('Select Total Budget Range', 
                                  min_value=0, 
                                  max_value=int(data['Total Budget (BUDGET)'].max()), 
                                  value=(0, int(data['Total Budget (BUDGET)'].max())))
+else:
+    budget_range = (0, int(data['Total Budget (BUDGET)'].max()))
 
 # Excess Budget per Student filter using sliders
-excess_budget_range = st.sidebar.slider('Select Excess Budget per Student Range', 
+if 'Excess Budget per Student' in selected_options:
+    excess_budget_range = st.sidebar.slider('Select Excess Budget per Student Range', 
                                         min_value=float(data['Excess Budget per Student'].min()), 
                                         max_value=float(data['Excess Budget per Student'].max()), 
                                         value=(float(data['Excess Budget per Student'].min()), float(data['Excess Budget per Student'].max())))
+else:
+    excess_budget_range = (float(data['Excess Budget per Student'].min()), float(data['Excess Budget per Student'].max()))
 
 # Budget Efficiency filter using sliders
-budget_efficiency_range = st.sidebar.slider('Select Budget Efficiency Range', 
+if 'Budget Efficiency' in selected_options:
+    budget_efficiency_range = st.sidebar.slider('Select Budget Efficiency Range', 
                                             min_value=float(data['Budget Efficiency'].min()), 
                                             max_value=float(data['Budget Efficiency'].max()), 
                                             value=(float(data['Budget Efficiency'].min()), float(data['Budget Efficiency'].max())))
+else:
+    budget_efficiency_range = (float(data['Budget Efficiency'].min()), float(data['Budget Efficiency'].max()))
+
 
 # Disadvantage Score filter using sliders
-disadvantage_score_range = st.sidebar.slider('Select Disadvantage Score Range', 
+if 'Disadvantage Score' in selected_options:
+    disadvantage_score_range = st.sidebar.slider('Select Disadvantage Score Range', 
                                              min_value=0.0, 
                                              max_value=float(data['Disadvantage Score'].max()), 
                                              value=(0.0, float(data['Disadvantage Score'].max())))
+else:
+    disadvantage_score_range = (0.0, float(data['Disadvantage Score'].max()))
 
 # Total AAFTE Enrollment range filter using sliders
-enrollment_range = st.sidebar.slider('Select Total AAFTE Enrollment Range', 
+if 'Enrollment Toal' in selected_options:
+    enrollment_range = st.sidebar.slider('Select Total AAFTE Enrollment Range', 
                                      min_value=0, 
                                      max_value=int(data['Total AAFTE* Enrollment (ENROLLMENT)'].max()), 
                                      value=(0,300))
+else:
+    enrollment_range = (0, int(data['Total AAFTE* Enrollment (ENROLLMENT)'].max()))
+
 
 # School Capacity range filter using sliders
-capacity = st.sidebar.slider('Select Total Capacity Percent Range', 
+if 'Capacity Total' in selected_options:
+    capacity = st.sidebar.slider('Select Total Capacity Percent Range', 
                                      min_value=0.0, 
                                      max_value=float(data['Capacity Percent'].max()), 
                                      value=(0.0, 0.65))
+else:
+    capacity = (0.0, float(data['Capacity Percent'].max()))
 
-low_range_color = st.sidebar.selectbox('Capacity Low Range Color (< 75%)', color_options, index=color_options.index('lightgreen'))
-mid_range_color = st.sidebar.selectbox('Capacity Mid Range Color (75% - 95%)', color_options, index=color_options.index('green'))
-high_range_color = st.sidebar.selectbox('Capacity High Range Color (> 95%)', color_options, index=color_options.index('darkgreen'))
-closed_school_color = st.sidebar.selectbox('Closed School Color', color_options, index=color_options.index('black'))
+
 
 # Apply filters
 filtered_data = data[(data['Landmark'].isin(selected_landmark)) &
@@ -121,7 +147,7 @@ filtered_data = data[(data['Landmark'].isin(selected_landmark)) &
                      (data['Total AAFTE* Enrollment (ENROLLMENT)'] <= enrollment_range[1]) & 
                      (data['Capacity Percent'] >= capacity[0]) & 
                      (data['Capacity Percent'] <= capacity[1]) & 
-                     (data['In Filter'] == True)
+                     (data['Simulate Closing'] == True)
 ]
 
 
@@ -132,7 +158,7 @@ filtered_data = data[(data['Landmark'].isin(selected_landmark)) &
 st.subheader(f'Filtered Data: ({filtered_data.shape[0]})')
 
 
-data['In Filter'] = data['School'].isin(filtered_data['School'])
+data['Simulate Closing'] = data['School'].isin(filtered_data['School'])
 filtered_data = data[(data['Landmark'].isin(selected_landmark)) &
     (data['Total Budget (BUDGET)'] >= budget_range[0]) & 
     (data['Total Budget (BUDGET)'] <= budget_range[1]) & 
@@ -146,10 +172,10 @@ filtered_data = data[(data['Landmark'].isin(selected_landmark)) &
     (data['Total AAFTE* Enrollment (ENROLLMENT)'] <= enrollment_range[1]) &
     (data['Capacity Percent'] >= capacity[0]) & 
     (data['Capacity Percent'] <= capacity[1]) & 
-    (data['In Filter'] == True)]
-t1 = st.data_editor(data[['In Filter','School', 'Total AAFTE* Enrollment (ENROLLMENT)','Predicted Total Budget (BUDGET)','Total Budget (BUDGET)','Excess Budget per Student','Capacity','Capacity Percent']]) 
+    (data['Simulate Closing'] == True)]
+t1 = st.data_editor(data[['Simulate Closing','School', 'Total AAFTE* Enrollment (ENROLLMENT)','Predicted Total Budget (BUDGET)','Total Budget (BUDGET)','Excess Budget per Student','Capacity','Capacity Percent']]) 
 
-sync_dataframes(data, t1, 'In Filter')
+sync_dataframes(data, t1, 'Simulate Closing')
 
 
 filtered_data = data[(data['Landmark'].isin(selected_landmark)) &
@@ -165,7 +191,7 @@ filtered_data = data[(data['Landmark'].isin(selected_landmark)) &
     (data['Total AAFTE* Enrollment (ENROLLMENT)'] <= enrollment_range[1]) &
     (data['Capacity Percent'] >= capacity[0]) & 
     (data['Capacity Percent'] <= capacity[1]) & 
-    (data['In Filter'] == True)]
+    (data['Simulate Closing'] == True)]
 
 
 
@@ -175,6 +201,17 @@ st.subheader('Map of School Locations')
 
 # Create a map centered around Seattle with a dark base map
 m = folium.Map(location=[filtered_data['latitude'].mean(), filtered_data['longitude'].mean()], zoom_start=11, tiles='CartoDB dark_matter')
+
+
+#low_range_color = st.selectbox('Capacity Low Range Color (< 75%)', color_options, index=color_options.index('lightgreen'))
+low_range_color = 'lightgreen'
+#mid_range_color = st.selectbox('Capacity Mid Range Color (75% - 95%)', color_options, index=color_options.index('green'))
+mid_range_color = 'green'
+#high_range_color = st.selectbox('Capacity High Range Color (> 95%)', color_options, index=color_options.index('darkgreen'))
+high_range_color = 'darkgreen'
+#closed_school_color = st.selectbox('Closed School Color', color_options, index=color_options.index('black'))
+closed_school_color = 'black'
+
 
 # Add all schools to the map with different colors
 for _, row in data.iterrows():
@@ -203,21 +240,22 @@ ax.set_ylabel('Number of Schools')
 ###st.subheader('2D Scatter Plot of Selected Dimensions')
 
 # Dropdown menus for selecting dimensions
-x_dimension = st.selectbox('Select X Dimension', options=data.columns, index=data.columns.get_loc('Total Budget (BUDGET)'))
-y_dimension = st.selectbox('Select Y Dimension', options=data.columns, index=data.columns.get_loc('Budget Efficiency'))
+#x_dimension = st.selectbox('Select X Dimension', options=data.columns, index=data.columns.get_loc('Total Budget (BUDGET)'))
+#y_dimension = st.selectbox('Select Y Dimension', options=data.columns, index=data.columns.get_loc('Budget Efficiency'))
 
 # Create scatter plot
-fig, ax = plt.subplots()
-ax.scatter(data[x_dimension], data[y_dimension], color='gray', edgecolor='black', alpha=0.5, label='Not in Filter')
-ax.scatter(filtered_data[x_dimension], filtered_data[y_dimension], color='salmon', edgecolor='black', label='In Filter')
-ax.set_title(f'Scatter Plot of {x_dimension} vs {y_dimension}')
-ax.set_xlabel(x_dimension)
-ax.set_ylabel(y_dimension)
-ax.legend()
+#fig, ax = plt.subplots()
+#ax.scatter(data[x_dimension], data[y_dimension], color='gray', edgecolor='black', alpha=0.5, label='Not in Filter')
+#ax.scatter(filtered_data[x_dimension], filtered_data[y_dimension], color='salmon', edgecolor='black', label='In Filter')
+#ax.set_title(f'Scatter Plot of {x_dimension} vs {y_dimension}')
+#ax.set_xlabel(x_dimension)
+#ax.set_ylabel(y_dimension)
+#ax.legend()
 ###st.pyplot(fig)
 
 
-st.subheader("All Data:")
-st.dataframe(data)
+
+#st.subheader("All Data:")
+#st.dataframe(data)
 
 
