@@ -31,7 +31,7 @@ def sync_dataframes(df1, df2, column_name):
 # Load data
 data = pd.read_csv('data/performance_data_2023.csv')
 
-# Clean data
+# Clean data\
 data = data.rename(columns=lambda x: x.strip()).drop(columns=['Unnamed: 0'])
 data['Necessary Budget'] = 500000 + data['Total Budget (BUDGET)']
 data['Budget Efficiency'] = data['Total Budget (BUDGET)'] / data['Total AAFTE* Enrollment (ENROLLMENT)']
@@ -53,13 +53,24 @@ data = data.rename(columns={'Latitude': 'latitude', 'Longitude': 'longitude'})
 # Title
 st.title('Seattle Elementary Schools Budget Analysis')
 
+
+
+
+
+
+
+
+
+
+
+
+
 # Sidebar for filtering
 st.sidebar.header('Which schools do you want to simulate closing?...')
 
- 
 
 selected_options =  st.sidebar.multiselect("Metrics to Find Schools to Close...",
-        ['School Budget', 'Excess Budget per Student', 'Budget Efficiency', 'Disadvantage Score','Enrollment Toal', 'Capacity Total','School Landmark Status'], ['Enrollment Toal', 'Capacity Total'])
+        ['School Budget', 'Excess Budget per Student', 'Disadvantage Score','Enrollment Toal', 'Capacity Total','School Landmark Status'], ['Enrollment Toal', 'Capacity Total'])
 
 color_options = ['red', 'blue', 'green', 'purple', 'orange', 'darkred', 'lightred', 'beige',
                  'darkblue', 'darkgreen', 'cadetblue', 'darkpurple', 'white', 'pink',
@@ -131,22 +142,24 @@ else:
     capacity = (0.0, float(data['Capacity Percent'].max()))
 
 
+manual_school = st.sidebar.multiselect('Manually Select Additional Schools to Close', data['School'].unique(), ['Cascadia Elementary'])
+
 
 # Apply filters
-filtered_data = data[(data['Landmark'].isin(selected_landmark)) &
+filtered_data = data[((data['Landmark'].isin(selected_landmark)) &
                      (data['Total Budget (BUDGET)'] >= budget_range[0]) & 
                      (data['Total Budget (BUDGET)'] <= budget_range[1]) & 
                      (data['Excess Budget per Student'] >= excess_budget_range[0]) &
                      (data['Excess Budget per Student'] <= excess_budget_range[1]) &
-                     (data['Budget Efficiency'] >= budget_efficiency_range[0]) &
-                     (data['Budget Efficiency'] <= budget_efficiency_range[1]) &
+                     #(data['Budget Efficiency'] >= budget_efficiency_range[0]) &
+                     #(data['Budget Efficiency'] <= budget_efficiency_range[1]) &
                      (data['Disadvantage Score'] >= disadvantage_score_range[0]) &
                      (data['Disadvantage Score'] <= disadvantage_score_range[1]) &
                      (data['Total AAFTE* Enrollment (ENROLLMENT)'] >= enrollment_range[0]) & 
                      (data['Total AAFTE* Enrollment (ENROLLMENT)'] <= enrollment_range[1]) & 
                      (data['Capacity Percent'] >= capacity[0]) & 
-                     (data['Capacity Percent'] <= capacity[1]) & 
-                     (data['Simulate Closing'] == True)
+                     (data['Capacity Percent'] <= capacity[1]))|
+                        (data['School'].isin(manual_school)) 
 ]
 
 
@@ -154,65 +167,38 @@ filtered_data = data[(data['Landmark'].isin(selected_landmark)) &
 
 
 # Main panel
-st.subheader(f'Filtered Data: ({filtered_data.shape[0]})')
-
-
-data['Simulate Closing'] = data['School'].isin(filtered_data['School'])
-filtered_data = data[(data['Landmark'].isin(selected_landmark)) &
-    (data['Total Budget (BUDGET)'] >= budget_range[0]) & 
-    (data['Total Budget (BUDGET)'] <= budget_range[1]) & 
-    (data['Excess Budget per Student'] >= excess_budget_range[0]) &
-    (data['Excess Budget per Student'] <= excess_budget_range[1]) &
-    (data['Budget Efficiency'] >= budget_efficiency_range[0]) &
-    (data['Budget Efficiency'] <= budget_efficiency_range[1]) &
-    (data['Disadvantage Score'] >= disadvantage_score_range[0]) &
-    (data['Disadvantage Score'] <= disadvantage_score_range[1]) &
-    (data['Total AAFTE* Enrollment (ENROLLMENT)'] >= enrollment_range[0]) & 
-    (data['Total AAFTE* Enrollment (ENROLLMENT)'] <= enrollment_range[1]) &
-    (data['Capacity Percent'] >= capacity[0]) & 
-    (data['Capacity Percent'] <= capacity[1]) & 
-    (data['Simulate Closing'] == True)]
-t1 = st.data_editor(data[['Simulate Closing','School', 'Total AAFTE* Enrollment (ENROLLMENT)','Predicted Total Budget (BUDGET)','Total Budget (BUDGET)','Excess Budget per Student','Capacity','Capacity Percent']]) 
-
-sync_dataframes(data, t1, 'Simulate Closing')
-
-
-filtered_data = data[(data['Landmark'].isin(selected_landmark)) &
-    (data['Total Budget (BUDGET)'] >= budget_range[0]) & 
-    (data['Total Budget (BUDGET)'] <= budget_range[1]) & 
-    (data['Excess Budget per Student'] >= excess_budget_range[0]) &
-    (data['Excess Budget per Student'] <= excess_budget_range[1]) &
-    (data['Budget Efficiency'] >= budget_efficiency_range[0]) &
-    (data['Budget Efficiency'] <= budget_efficiency_range[1]) &
-    (data['Disadvantage Score'] >= disadvantage_score_range[0]) &
-    (data['Disadvantage Score'] <= disadvantage_score_range[1]) &
-    (data['Total AAFTE* Enrollment (ENROLLMENT)'] >= enrollment_range[0]) & 
-    (data['Total AAFTE* Enrollment (ENROLLMENT)'] <= enrollment_range[1]) &
-    (data['Capacity Percent'] >= capacity[0]) & 
-    (data['Capacity Percent'] <= capacity[1]) & 
-    (data['Simulate Closing'] == True)]
 
 
 
+col1, col2, col3 = st.columns(3)
+
+col1.metric('Updated Elementary Budget', value=f"${data['Total Budget (BUDGET)'].sum() - filtered_data['Total Budget (BUDGET)'].sum():,.0f}",delta=f"-{filtered_data['Total Budget (BUDGET)'].sum():,.0f}", delta_color="inverse")
+col2.metric('Schools Remaining Open', f"{len(data) - len(filtered_data)}", delta=f"-{len(filtered_data)}", delta_color="inverse")
+col3.metric('Total Student Enrollment', f"{data['Total AAFTE* Enrollment (ENROLLMENT)'].sum() - filtered_data['Total AAFTE* Enrollment (ENROLLMENT)'].sum():,.0f}", delta=f"-{filtered_data['Total AAFTE* Enrollment (ENROLLMENT)'].sum():,.0f}", delta_color="inverse")
+
+
+st.data_editor(filtered_data) 
 
 # Map of school locations with different colors for filtered and non-filtered schools
 st.subheader('Map of School Locations')
 
 # Create a map centered around Seattle with a dark base map
-try: 
-    m = folium.Map(location=[filtered_data['latitude'].mean(), filtered_data['longitude'].mean()], zoom_start=11, tiles='CartoDB dark_matter')
-except:
-    m = folium.Map(location=[data['latitude'].mean(), data['longitude'].mean()], zoom_start=11, tiles='CartoDB dark_matter')
+#try: 
+#    m = folium.Map(location=[filtered_data['latitude'].mean(), filtered_data['longitude'].mean()], zoom_start=11, tiles='CartoDB dark_matter')
+#except:
+#    m = folium.Map(location=[data['latitude'].mean(), data['longitude'].mean()], zoom_start=11, tiles='CartoDB dark_matter')
+
+m = folium.Map(location=[data['latitude'].mean(), data['longitude'].mean()], zoom_start=11, tiles='CartoDB dark_matter')
 
 
 #low_range_color = st.selectbox('Capacity Low Range Color (< 75%)', color_options, index=color_options.index('lightgreen'))
-low_range_color = 'lightgreen'
+low_range_color = 'lightred'
 #mid_range_color = st.selectbox('Capacity Mid Range Color (75% - 95%)', color_options, index=color_options.index('green'))
-mid_range_color = 'green'
+mid_range_color = 'red'
 #high_range_color = st.selectbox('Capacity High Range Color (> 95%)', color_options, index=color_options.index('darkgreen'))
-high_range_color = 'darkgreen'
+high_range_color = 'darkred'
 #closed_school_color = st.selectbox('Closed School Color', color_options, index=color_options.index('black'))
-closed_school_color = 'black'
+closed_school_color = 'gray'
 
 
 # Add all schools to the map with different colors
@@ -227,10 +213,9 @@ try:
 except:
     st.write("")
 
-
 # Display the map
 try: 
-    st_folium(m, width=700, height=500)
+    st_folium(m, width=700, height=500) 
 except:
     st.write("")
 
