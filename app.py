@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 import folium
 from streamlit_folium import st_folium
 
+st.set_page_config(layout="wide")
 
 def determine_color(capacity_percent):
     if float(capacity_percent) < 0.75:
@@ -37,15 +38,14 @@ data['Necessary Budget'] = 500000 + data['Total Budget (BUDGET)']
 data['Budget Efficiency'] = data['Total Budget (BUDGET)'] / data['Total AAFTE* Enrollment (ENROLLMENT)']
 data['Landmark'] = data['Landmark'].fillna('N')
 data['Landmark'] = data['Landmark'].replace({'None': 'N', 'NA': 'N'})
-data['Simulate Closing'] = True
 data.drop(columns='Year', inplace=True)
 
                                     
 
 # Move the rightmost column to the leftmost position
-columns = data.columns.tolist()
-columns = [columns[-1]] + columns[:-1]
-data = data[columns]
+#columns = data.columns.tolist()
+#columns = [columns[-1]] + columns[:-1]
+#data = data[columns]
 
 # Rename latitude and longitude columns to lowercase due to nuances with folium
 data = data.rename(columns={'Latitude': 'latitude', 'Longitude': 'longitude'})
@@ -70,7 +70,7 @@ st.sidebar.header('Which schools do you want to simulate closing?...')
 
 
 selected_options =  st.sidebar.multiselect("Metrics to Find Schools to Close...",
-        ['School Budget', 'Excess Budget per Student', 'Disadvantage Score','Enrollment Toal', 'Capacity Total','School Landmark Status'], ['Enrollment Toal', 'Capacity Total'])
+        ['School Budget','Distance to Closest School','Excess Budget per Student', 'Disadvantage Score','Enrollment Toal', 'Capacity Total','School Landmark Status'], ['Enrollment Toal', 'Capacity Total'])
 
 color_options = ['red', 'blue', 'green', 'purple', 'orange', 'darkred', 'lightred', 'beige',
                  'darkblue', 'darkgreen', 'cadetblue', 'darkpurple', 'white', 'pink',
@@ -121,6 +121,17 @@ if 'Disadvantage Score' in selected_options:
 else:
     disadvantage_score_range = (0.0, float(data['Disadvantage Score'].max()))
 
+
+# Distance to nearest school using sliders
+if 'Distance to Closest School' in selected_options:
+    distance_range = st.sidebar.slider('Select Distance to Closest School Range', 
+                                     min_value=0.0, 
+                                     max_value=float(data['Distance to Closest School (miles)'].max()), 
+                                     value=(0.0, float(data['Distance to Closest School (miles)'].max())))
+else:
+    distance_range = (0.0, float(data['Distance to Closest School (miles)'].max()))
+
+
 # Total AAFTE Enrollment range filter using sliders
 if 'Enrollment Toal' in selected_options:
     enrollment_range = st.sidebar.slider('Select Total AAFTE Enrollment Range', 
@@ -153,6 +164,8 @@ filtered_data = data[((data['Landmark'].isin(selected_landmark)) &
                      (data['Excess Budget per Student'] <= excess_budget_range[1]) &
                      #(data['Budget Efficiency'] >= budget_efficiency_range[0]) &
                      #(data['Budget Efficiency'] <= budget_efficiency_range[1]) &
+                    (data['Distance to Closest School (miles)'] >= distance_range[0]) &
+                    (data['Distance to Closest School (miles)'] <= distance_range[1]) &
                      (data['Disadvantage Score'] >= disadvantage_score_range[0]) &
                      (data['Disadvantage Score'] <= disadvantage_score_range[1]) &
                      (data['Total AAFTE* Enrollment (ENROLLMENT)'] >= enrollment_range[0]) & 
@@ -177,10 +190,10 @@ col2.metric('Schools Remaining Open', f"{len(data) - len(filtered_data)}", delta
 col3.metric('Total Student Enrollment', f"{data['Total AAFTE* Enrollment (ENROLLMENT)'].sum() - filtered_data['Total AAFTE* Enrollment (ENROLLMENT)'].sum():,.0f}", delta=f"-{filtered_data['Total AAFTE* Enrollment (ENROLLMENT)'].sum():,.0f}", delta_color="inverse")
 
 
-st.data_editor(filtered_data) 
+st.data_editor(filtered_data, use_container_width=True, hide_index=True, width=10000) 
 
 # Map of school locations with different colors for filtered and non-filtered schools
-st.subheader('Map of School Locations')
+st.subheader('Capacity After School Closures')
 
 # Create a map centered around Seattle with a dark base map
 #try: 
