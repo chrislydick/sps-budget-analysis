@@ -61,16 +61,16 @@ Index,School,School Type,Index Type,Primary Index
 59,Wedgwood Elementary,E,P,59
 60,West Seattle Elementary,E,P,60
 61,West Woodland Elementary,E,P,61
-62,Blaine,K-8,P,62
-63,Louisa Boren (STEM),K-8,P,63
-64,Broadview-Thomson,K-8,P,64
-65,Pathfinder/Cooper,K-8,P,65
-66,Hazel Wolf,K-8,P,66
-67,Monroe/Salmon Bay,K-8,P,67
-68,TOPS/Seward,K-8,P,68
-69,Orca/Whitworth,K-8,P,69
-70,South Shore,K-8,P,70
-71,Licton Springs/Webster,K-8,P,71
+62,Blaine,E,P,62
+63,Louisa Boren (STEM),E,P,63
+64,Broadview-Thomson,E,P,64
+65,Pathfinder/Cooper,E,P,65
+66,Hazel Wolf,E,P,66
+67,Monroe/Salmon Bay,E,P,67
+68,TOPS/Seward,E,P,68
+69,Orca/Whitworth,E,P,69
+70,South Shore,E,P,70
+71,Licton Springs/Webster,E,P,71
 72,Aki Kurose,M,P,72
 73,David T. Denny International,M,P,73
 74,Eckstein,M,P,74
@@ -195,7 +195,7 @@ Index,School,School Type,Index Type,Primary Index
 193,Rising Star,E,aka,48
 194,John Stanford,E,aka,54
 195,Wedgewood,E,aka,59
-196,Broadview-Thomson K-8,K-8,aka,64
+196,Broadview-Thomson K-8,E,aka,64
 197,Beacon Hill Intl,E,aka,4
 198,Martin Luther King,E,aka,26
 199,Dearborn Park Intl,E,aka,11
@@ -213,3 +213,31 @@ Index,School,School Type,Index Type,Primary Index
 211,Muir,E,aka,41
 212,Rogers,E,aka,49
 213,West Seattle Elem,E,aka,60
+214,South Shore PK-8,E,aka,70
+215,Orca K-8,E,aka,69
+216,STEM K-8,E,aka,63
+217,TOPS K-8,E,aka,68
+218,Cascade Parent Partnership,E,P,218
+219,Hazel Wolf K-8,E,aka,66
+220,In Tandem,E,P,220
+221,McDonald Intl,E,aka,38
+222,Mercer Intl,M,aka,80
+223,David T. Denny Intl,M,aka,73
+224,Pathfinder K-8,E,aka,65
+225,Priv/Paroch Sped,E,aka,201
+226,Exp. Ed. Unit,E,P,226
+227,Salmon Bay K-8,E,aka,67
+228,Non Public Agencies,E,P,228
+229,Licton Springs K-8,E,aka,71
+230,Catharine Blaine K-8,E,aka,62
+231,Hamilton Intl,M,aka,75
+232,Jane Addams MS,M,aka,76
+233,B. F. Day,E,aka,10
+234,Out of District/Unknowr,E,aka,201
+235,Concord Int,E,aka,9
+236,Out of District/Unknow,E,aka,201
+237,Olympic Hills,E,aka,44 
+238,Olympic View,E,aka,45
+239,Rainer View,E,aka,47
+240,Thorton Creek,E,aka,56
+241,Queen Anne K-5,E,aka,46
