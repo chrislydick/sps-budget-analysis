@@ -66,7 +66,7 @@ st.title('Seattle Elementary Schools Budget Analysis')
 
 
 # Sidebar for filtering
-st.sidebar.header('Which schools do you want to simulate closing?...')
+st.sidebar.header('Adjust the filters below ')
 
 
 selected_options =  st.sidebar.multiselect("Metrics to Find Schools to Close...",
@@ -187,7 +187,7 @@ col1, col2, col3 = st.columns(3)
 
 col1.metric('Updated Elementary Budget', value=f"${data['Total Budget (BUDGET)'].sum() - filtered_data['Total Budget (BUDGET)'].sum():,.0f}",delta=f"-{filtered_data['Total Budget (BUDGET)'].sum():,.0f}", delta_color="inverse")
 col2.metric('Schools Remaining Open', f"{len(data) - len(filtered_data)}", delta=f"-{len(filtered_data)}", delta_color="inverse")
-col3.metric('Total Student Enrollment', f"{data['Total AAFTE* Enrollment (ENROLLMENT)'].sum() - filtered_data['Total AAFTE* Enrollment (ENROLLMENT)'].sum():,.0f}", delta=f"-{filtered_data['Total AAFTE* Enrollment (ENROLLMENT)'].sum():,.0f}", delta_color="inverse")
+col3.metric('Total Student Enrollment', f"{data['Total AAFTE* Enrollment (ENROLLMENT)'].sum() - filtered_data['Total AAFTE* Enrollment (ENROLLMENT)'].sum():,.0f}", delta=f"-{filtered_data['Total AAFTE* Enrollment (ENROLLMENT)'].sum():,.0f}")
 
 
 st.data_editor(filtered_data, use_container_width=True, hide_index=True, width=10000) 
