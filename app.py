@@ -3,6 +3,8 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import folium
 from streamlit_folium import st_folium
+from streamlit.components.v1 import html
+
 
 st.set_page_config(layout="wide")
 
@@ -28,6 +30,53 @@ def sync_dataframes(df1, df2, column_name):
     
     return df1
 
+def move_column(dataframe, column, position):
+    cols = list(dataframe.columns)
+    cols.insert(position, cols.pop(cols.index(column)))
+    return dataframe[cols]
+
+
+intro_js = """
+<link rel="stylesheet" href="https://unpkg.com/intro.js/minified/introjs.min.css">
+<script src="https://unpkg.com/intro.js/minified/intro.min.js"></script>
+"""
+
+# JavaScript to start the tour
+start_tour_js = """
+<script type="text/javascript">
+function startTour() {
+    function checkElements() {
+        const step1 = document.querySelector("#step1");
+        const step2 = document.querySelector("#step2");
+
+        if (step1 && step2) {
+            introJs().setOptions({
+                steps: [
+                    {
+                        intro: "Welcome to the tour!"
+                    },
+                    {
+                        element: step1,
+                        intro: "This is the first step.",
+                        position: 'right'
+                    },
+                    {
+                        element: step2,
+                        intro: "This is the second step.",
+                        position: 'right'
+                    }
+                ]
+            }).start();
+        } else {
+            setTimeout(checkElements, 100); // Check again after 100ms
+        }
+    }
+
+    checkElements();
+}
+</script>
+"""
+
 
 # Load data
 data = pd.read_csv('data/performance_data_2023.csv')
@@ -37,7 +86,10 @@ data = data.rename(columns=lambda x: x.strip()).drop(columns=['Unnamed: 0'])
 data['Necessary Budget'] = 500000 + data['Total Budget (BUDGET)']
 data['Budget Efficiency'] = data['Total Budget (BUDGET)'] / data['Total AAFTE* Enrollment (ENROLLMENT)']
 data['Landmark'] = data['Landmark'].fillna('N')
-data['Landmark'] = data['Landmark'].replace({'None': 'N', 'NA': 'N'})
+data['Building Condition Score'] = data['Building Condition Score'].fillna(0)
+data['Building Condition'] = data['Building Condition'].fillna('0. None')
+data['Landmark'] = data['Landmark'].replace({'None': 'N', 'NA': 'N', '0': 'N', 0:'N'})
+data['Use'] = data['Use'].replace({'0':'K-12', 0:'K-12'})
 data.drop(columns='Year', inplace=True)
 
                                     
@@ -70,7 +122,7 @@ st.sidebar.header('Adjust the filters below ')
 
 
 selected_options =  st.sidebar.multiselect("Metrics to Find Schools to Close...",
-        ['School Budget','Building Condition Score', 'Distance to Closest School','Excess Budget per Student', 'Disadvantage Score','Enrollment Toal', 'Capacity Total','School Landmark Status'], ['Enrollment Toal', 'Capacity Total'])
+        ['School Budget','School Type','Building Condition Score', 'Distance to Closest School','Excess Budget per Student', 'Disadvantage Score','Enrollment Toal', 'Capacity Total','School Landmark Status'], ['Enrollment Toal', 'Capacity Total'])
 
 color_options = ['red', 'blue', 'green', 'purple', 'orange', 'darkred', 'lightred', 'beige',
                  'darkblue', 'darkgreen', 'cadetblue', 'darkpurple', 'white', 'pink',
@@ -161,6 +213,12 @@ if 'Building Condition Score' in selected_options:
 else:
     building_condition_score = (0.0, float(data['Building Condition Score'].max()))
 
+if 'School Type' in selected_options:
+    school_type = st.sidebar.multiselect('Select School Type', data['Use'].unique(), default=data['Use'].unique())
+else:
+    school_type = data['Use'].unique()
+
+    
 
 
 manual_school = st.sidebar.multiselect('Manually Select Additional Schools to Close', data['School'].unique())
@@ -183,7 +241,8 @@ filtered_data = data[((data['Landmark'].isin(selected_landmark)) &
                      (data['Capacity Percent'] >= capacity[0]) & 
                      (data['Capacity Percent'] <= capacity[1]) &
                      (data['Building Condition Score'] >= building_condition_score[0]) &
-                     (data['Building Condition Score'] <= building_condition_score[1]) 
+                     (data['Building Condition Score'] <= building_condition_score[1]) &
+                        (data['Use'].isin(school_type))
                      ) |
                      (data['School'].isin(manual_school)) 
 ]
@@ -208,7 +267,14 @@ col5.metric('Schools Over 100% Capacity', f"{len(data[data['Capacity Percent'] >
 
 #identify all column names beginning with 'Cluster_'
 cluster_columns = [col for col in data.columns if 'Cluster_' in col]
-st.data_editor(filtered_data.drop(columns=cluster_columns), use_container_width=True, hide_index=True, width=10000) 
+data_editor_data = filtered_data.drop(columns=cluster_columns)
+data_moved = move_column(data_editor_data, 'Use', 1)
+data_moved = move_column(data_moved, 'Total AAFTE* Enrollment (ENROLLMENT)', 2)
+data_moved = move_column(data_moved, 'Capacity', 3)
+data_moved = move_column(data_moved, 'Capacity Percent', 4)
+data_moved['Capacity Percent'] = data_moved['Capacity Percent'].map(lambda x: f"{x:.0%}")
+data_moved.rename(columns={'Total AAFTE* Enrollment (ENROLLMENT)':'Enrollment'}, inplace=True)
+st.data_editor(data_moved, use_container_width=True, hide_index=True, width=10000) 
 
 # Map of school locations with different colors for filtered and non-filtered schools
 col1a, col2a = st.columns(2)
@@ -296,9 +362,13 @@ ax.set_ylabel('Number of Schools')
 #ax.legend()
 ###st.pyplot(fig)
 
+if st.button("Start Tour"):
+    html(f"{intro_js} {start_tour_js} <script>startTour();</script>", height=0)
 
+# Ensure the elements exist before starting the tour
+st.markdown("<div id='step1'>This is some content for step 1</div>", unsafe_allow_html=True)
+st.markdown("<div id='step2'>This is some content for step 2</div>", unsafe_allow_html=True)
 
 #st.subheader("All Data:")
 #st.dataframe(data)
-
 
