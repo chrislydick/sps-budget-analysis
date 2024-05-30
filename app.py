@@ -188,7 +188,7 @@ col1, col2, col3, col4, col5 = st.columns(5)
 col1.metric('Updated Elementary Budget', value=f"${data['Total Budget (BUDGET)'].sum() - filtered_data['Total Budget (BUDGET)'].sum():,.0f}",delta=f"-{filtered_data['Total Budget (BUDGET)'].sum():,.0f}", delta_color="inverse")
 col2.metric('Schools Remaining Open', f"{len(data) - len(filtered_data)}", delta=f"-{len(filtered_data)}", delta_color="inverse")
 col3.metric('Total Student Enrollment', f"{data['Total AAFTE* Enrollment (ENROLLMENT)'].sum() - filtered_data['Total AAFTE* Enrollment (ENROLLMENT)'].sum():,.0f}", delta=f"-{filtered_data['Total AAFTE* Enrollment (ENROLLMENT)'].sum():,.0f}")
-col4.metric('Schools Under 75% Capacity', f"{len(filtered_data[filtered_data['Capacity Percent'] < 0.75])}", delta=f"-{len(data[data['Capacity Percent'] < 0.75])-len(filtered_data[filtered_data['Capacity Percent'] < 0.75])}", delta_color="inverse")
+col4.metric('Schools Under 75% Capacity', f"{len(data[data['Capacity Percent'] < 0.75])-len(filtered_data[filtered_data['Capacity Percent'] < 0.75])}", delta=f"-{len(filtered_data[filtered_data['Capacity Percent'] < 0.75])}", delta_color="inverse")
 col5.metric('Schools Over 100% Capacity', f"{len(filtered_data[filtered_data['Capacity Percent'] > 1.0])}", delta=f"-{len(data[data['Capacity Percent'] > 1.0])-len(filtered_data[filtered_data['Capacity Percent'] > 1.0])}", delta_color="inverse")
 
 #identify all column names beginning with 'Cluster_'
