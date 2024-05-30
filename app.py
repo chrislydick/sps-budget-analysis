@@ -163,7 +163,7 @@ else:
 
 
 
-manual_school = st.sidebar.multiselect('Manually Select Additional Schools to Close', data['School'].unique(), ['Cascadia Elementary'])
+manual_school = st.sidebar.multiselect('Manually Select Additional Schools to Close', data['School'].unique())
 
 
 # Apply filters
