@@ -189,11 +189,12 @@ col1.metric('Updated Elementary Budget', value=f"${data['Total Budget (BUDGET)']
 col2.metric('Schools Remaining Open', f"{len(data) - len(filtered_data)}", delta=f"-{len(filtered_data)}", delta_color="inverse")
 col3.metric('Total Student Enrollment', f"{data['Total AAFTE* Enrollment (ENROLLMENT)'].sum() - filtered_data['Total AAFTE* Enrollment (ENROLLMENT)'].sum():,.0f}", delta=f"-{filtered_data['Total AAFTE* Enrollment (ENROLLMENT)'].sum():,.0f}")
 
-
-st.data_editor(filtered_data, use_container_width=True, hide_index=True, width=10000) 
+#identify all column names beginning with 'Cluster_'
+cluster_columns = [col for col in data.columns if 'Cluster_' in col]
+st.data_editor(filtered_data.drop(columns=cluster_columns), use_container_width=True, hide_index=True, width=10000) 
 
 # Map of school locations with different colors for filtered and non-filtered schools
-st.subheader('Capacity After School Closures')
+col1a, col2a = st.columns(2)
 
 # Create a map centered around Seattle with a dark base map
 #try: 
@@ -202,16 +203,17 @@ st.subheader('Capacity After School Closures')
 #    m = folium.Map(location=[data['latitude'].mean(), data['longitude'].mean()], zoom_start=11, tiles='CartoDB dark_matter')
 
 m = folium.Map(location=[data['latitude'].mean(), data['longitude'].mean()], zoom_start=11, tiles='CartoDB dark_matter')
+n = folium.Map(location=[data['latitude'].mean(), data['longitude'].mean()], zoom_start=11, tiles='CartoDB dark_matter')
 
 
 #low_range_color = st.selectbox('Capacity Low Range Color (< 75%)', color_options, index=color_options.index('lightgreen'))
-low_range_color = 'lightred'
+low_range_color = 'lightblue'
 #mid_range_color = st.selectbox('Capacity Mid Range Color (75% - 95%)', color_options, index=color_options.index('green'))
-mid_range_color = 'red'
+mid_range_color = 'blue'
 #high_range_color = st.selectbox('Capacity High Range Color (> 95%)', color_options, index=color_options.index('darkgreen'))
-high_range_color = 'darkred'
+high_range_color = 'darkblue'
 #closed_school_color = st.selectbox('Closed School Color', color_options, index=color_options.index('black'))
-closed_school_color = 'gray'
+closed_school_color = 'red'
 
 
 # Add all schools to the map with different colors
@@ -223,15 +225,33 @@ try:
             popup=row['School'],
             icon=folium.Icon(color=color)
         ).add_to(m)
+    for _, row in data.iterrows():
+        color = determine_color(row['Capacity Percent'])
+        folium.Marker(
+            location=[row['latitude'], row['longitude']],
+            popup=row['School'],
+            icon=folium.Icon(color=color)
+        ).add_to(n)
 except:
     st.write("")
 
-# Display the map
-try: 
-    st_folium(m, width=700, height=500) 
-except:
-    st.write("")
+# Before School Closures
+with col1a:
+    try: 
+        st.subheader('Capacity Before School Closure(s)')
+        st_folium(n, width=700, height=500) 
+    except:
+        st.write("")
 
+
+
+# After School Closures
+with col2a: 
+    try: 
+        st.subheader('Capacity After School Closure(s)')
+        st_folium(m, width=700, height=500) 
+    except:
+        st.write("")
 # Plotting
 ###st.subheader('Budget Efficiency Distribution')
 fig, ax = plt.subplots()
