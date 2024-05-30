@@ -70,7 +70,7 @@ st.sidebar.header('Adjust the filters below ')
 
 
 selected_options =  st.sidebar.multiselect("Metrics to Find Schools to Close...",
-        ['School Budget','Distance to Closest School','Excess Budget per Student', 'Disadvantage Score','Enrollment Toal', 'Capacity Total','School Landmark Status'], ['Enrollment Toal', 'Capacity Total'])
+        ['School Budget','Building Condition Score', 'Distance to Closest School','Excess Budget per Student', 'Disadvantage Score','Enrollment Toal', 'Capacity Total','School Landmark Status'], ['Enrollment Toal', 'Capacity Total'])
 
 color_options = ['red', 'blue', 'green', 'purple', 'orange', 'darkred', 'lightred', 'beige',
                  'darkblue', 'darkgreen', 'cadetblue', 'darkpurple', 'white', 'pink',
@@ -152,6 +152,16 @@ if 'Capacity Total' in selected_options:
 else:
     capacity = (0.0, float(data['Capacity Percent'].max()))
 
+# Building Condition Score filter using sliders
+if 'Building Condition Score' in selected_options:
+    building_condition_score = st.sidebar.slider('Select Building Condition Score Range', 
+                                     min_value=0.0, 
+                                     max_value=float(data['Building Condition Score'].max()), 
+                                     value=(0.0, float(data['Building Condition Score'].max())))
+else:
+    building_condition_score = (0.0, float(data['Building Condition Score'].max()))
+
+
 
 manual_school = st.sidebar.multiselect('Manually Select Additional Schools to Close', data['School'].unique(), ['Cascadia Elementary'])
 
@@ -171,8 +181,11 @@ filtered_data = data[((data['Landmark'].isin(selected_landmark)) &
                      (data['Total AAFTE* Enrollment (ENROLLMENT)'] >= enrollment_range[0]) & 
                      (data['Total AAFTE* Enrollment (ENROLLMENT)'] <= enrollment_range[1]) & 
                      (data['Capacity Percent'] >= capacity[0]) & 
-                     (data['Capacity Percent'] <= capacity[1]))|
-                        (data['School'].isin(manual_school)) 
+                     (data['Capacity Percent'] <= capacity[1]) &
+                     (data['Building Condition Score'] >= building_condition_score[0]) &
+                     (data['Building Condition Score'] <= building_condition_score[1]) 
+                     ) |
+                     (data['School'].isin(manual_school)) 
 ]
 
 
