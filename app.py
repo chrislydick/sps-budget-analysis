@@ -36,46 +36,7 @@ def move_column(dataframe, column, position):
     return dataframe[cols]
 
 
-intro_js = """
-<link rel="stylesheet" href="https://unpkg.com/intro.js/minified/introjs.min.css">
-<script src="https://unpkg.com/intro.js/minified/intro.min.js"></script>
-"""
 
-# JavaScript to start the tour
-start_tour_js = """
-<script type="text/javascript">
-function startTour() {
-    function checkElements() {
-        const step1 = document.querySelector("#step1");
-        const step2 = document.querySelector("#step2");
-
-        if (step1 && step2) {
-            introJs().setOptions({
-                steps: [
-                    {
-                        intro: "Welcome to the tour!"
-                    },
-                    {
-                        element: step1,
-                        intro: "This is the first step.",
-                        position: 'right'
-                    },
-                    {
-                        element: step2,
-                        intro: "This is the second step.",
-                        position: 'right'
-                    }
-                ]
-            }).start();
-        } else {
-            setTimeout(checkElements, 100); // Check again after 100ms
-        }
-    }
-
-    checkElements();
-}
-</script>
-"""
 
 
 # Load data
@@ -362,12 +323,7 @@ ax.set_ylabel('Number of Schools')
 #ax.legend()
 ###st.pyplot(fig)
 
-if st.button("Start Tour"):
-    html(f"{intro_js} {start_tour_js} <script>startTour();</script>", height=0)
 
-# Ensure the elements exist before starting the tour
-st.markdown("<div id='step1'>This is some content for step 1</div>", unsafe_allow_html=True)
-st.markdown("<div id='step2'>This is some content for step 2</div>", unsafe_allow_html=True)
 
 #st.subheader("All Data:")
 #st.dataframe(data)
