@@ -380,6 +380,6 @@ ax.set_ylabel('Number of Schools')
 ###st.pyplot(fig)
 
 
-#st.subheader("All Data:")
-st.dataframe(data)
+st.subheader("All Data:")
+st.dataframe(data[['School','Use','Total Budget (BUDGET)','Total AAFTE* Enrollment (ENROLLMENT)','Enrollment from Redistribution','Total Enrollment','Capacity','Capacity Percent','Redistribution Capacity']].rename(columns={'Total AAFTE* Enrollment (ENROLLMENT)':'Enrollment', 'Capacity Percent':'Starting Capacity Percent','Redistribution Capacity':'Ending Capacity Percent','Capacity':'Building Capacity'}), width=10000)
 
