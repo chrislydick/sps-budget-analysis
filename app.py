@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 import folium
 from streamlit_folium import st_folium
 from streamlit.components.v1 import html
+import numpy as np
 
 
 st.set_page_config(layout="wide")
@@ -36,8 +37,51 @@ def move_column(dataframe, column, position):
     return dataframe[cols]
 
 
+def reallocate_student_counts(student_counts, redistribution_matrix, closed_schools):
+    # Convert input lists to numpy arrays for easy manipulation
+    student_counts = np.array(student_counts, dtype=float)
+    redistribution_matrix = np.array(redistribution_matrix, dtype=float)
+    closed_schools = set(closed_schools)
+
+    # Initialize current student counts
+    current_student_counts = np.copy(student_counts)
+    num_schools = len(student_counts)
+    
+    while True:
+        new_counts = np.copy(current_student_counts)
+        any_redistributed = False
+        
+        for school in closed_schools:
+            if current_student_counts[school] > 0:
+                any_redistributed = True
+                total_redistributed = current_student_counts[school]
+                
+                # Adjust redistribution percentages to only consider open schools
+                redistribution_percentages = np.copy(redistribution_matrix[school])
+                redistribution_percentages[list(closed_schools)] = 0
+                total_percentage = np.sum(redistribution_percentages)
+                
+                if total_percentage > 0:
+                    redistribution_percentages /= total_percentage
+                
+                for i in range(num_schools):
+                    if i not in closed_schools:
+                        new_counts[i] += total_redistributed * redistribution_percentages[i]
+                
+                new_counts[school] = 0
+        
+        if not any_redistributed:
+            break
+        
+        current_student_counts = new_counts
+    
+    return current_student_counts
+
 # Load data
 data = pd.read_csv('data/performance_data_2023.csv')
+matrix = pd.read_csv('data/redistribution_matrix.csv')
+counts = data[['Total AAFTE* Enrollment (ENROLLMENT)']].transpose().values[0]
+
 
 # Clean data\
 data = data.rename(columns=lambda x: x.strip()).drop(columns=['Unnamed: 0'])
@@ -48,6 +92,9 @@ data['Building Condition Score'] = data['Building Condition Score'].fillna(0)
 data['Building Condition'] = data['Building Condition'].fillna('0. None')
 data['Landmark'] = data['Landmark'].replace({'None': 'N', 'NA': 'N', '0': 'N', 0:'N'})
 data['Use'] = data['Use'].replace({'0':'K-12', 0:'K-12'})
+data['Enrollment from Redistribution'] = 0
+data['Redistribution Capacity'] = data['Capacity Percent']
+data['Total Enrollment'] = data['Total AAFTE* Enrollment (ENROLLMENT)']
 data.drop(columns='Year', inplace=True)
 
                                     
@@ -208,8 +255,12 @@ filtered_data = data[((data['Landmark'].isin(selected_landmark)) &
 
 
 
-
-
+before = reallocate_student_counts(counts, matrix, [])
+closed_schools = pd.array(filtered_data.index)
+after = reallocate_student_counts(counts, matrix, closed_schools)
+data['Enrollment from Redistribution'] = (after-before).astype(int)
+data['Total Enrollment'] = (data['Total AAFTE* Enrollment (ENROLLMENT)'] + data['Enrollment from Redistribution']).astype(int)
+data['Redistribution Capacity'] = (data['Total Enrollment'] / data['Capacity']).astype(float)
 # Main panel
 
 
@@ -266,19 +317,19 @@ closed_school_color = 'red'
 # Add all schools to the map with different colors
 try:
     for _, row in data.iterrows():
-        color = closed_school_color if row['School'] in filtered_data['School'].values else determine_color(row['Capacity Percent'])
-        folium.Marker(
-            location=[row['latitude'], row['longitude']],
-            popup=f"{row['School']} ({row['Capacity Percent']*100:.0f}%)",
-            icon=folium.Icon(color=color)
-        ).add_to(m)
-    for _, row in data.iterrows():
         color = determine_color(row['Capacity Percent'])
         folium.Marker(
             location=[row['latitude'], row['longitude']],
             popup=f"{row['School']} ({row['Capacity Percent']*100:.0f}%)",
             icon=folium.Icon(color=color)
         ).add_to(n)
+    for _, row in data.iterrows():
+        color = closed_school_color if row['School'] in filtered_data['School'].values else determine_color(row['Redistribution Capacity'])
+        folium.Marker(
+            location=[row['latitude'], row['longitude']],
+            popup=f"{row['School']} ({row['Capacity Percent']*100:.0f}% -> {row['Redistribution Capacity']*100:.0f}%)",
+            icon=folium.Icon(color=color)
+        ).add_to(m)
 except:
     st.write("")
 
@@ -330,5 +381,5 @@ ax.set_ylabel('Number of Schools')
 
 
 #st.subheader("All Data:")
-#st.dataframe(data)
+st.dataframe(data)
 
