@@ -255,21 +255,16 @@ filtered_data = data[((data['Landmark'].isin(selected_landmark)) &
 
 
 
-before = reallocate_student_counts(counts, matrix, [])
-closed_schools = pd.array(filtered_data.index)
-after = reallocate_student_counts(counts, matrix, closed_schools)
-data['Enrollment from Redistribution'] = (after-before).astype(int)
-data['Total Enrollment'] = (data['Total AAFTE* Enrollment (ENROLLMENT)'] + data['Enrollment from Redistribution']).astype(int)
-data['Redistribution Capacity'] = (data['Total Enrollment'] / data['Capacity']).astype(float)
+
 # Main panel
 
 
 st.subheader('')
 
 col1, col2, col3, col4, col5 = st.columns(5)
-col1.metric('Updated Elementary Budget', value=f"${data['Total Budget (BUDGET)'].sum() - filtered_data['Total Budget (BUDGET)'].sum():,.0f}",delta=f"-{filtered_data['Total Budget (BUDGET)'].sum():,.0f}", delta_color="inverse")
+col1.metric('Elementary Budget Unchanged', value=f"${data['Total Budget (BUDGET)'].sum() - filtered_data['Total Budget (BUDGET)'].sum():,.0f}",delta=f"-{filtered_data['Total Budget (BUDGET)'].sum():,.0f}", delta_color="inverse")
 col2.metric('Schools Remaining Open', f"{len(data) - len(filtered_data)}", delta=f"-{len(filtered_data)}", delta_color="inverse")
-col3.metric('Total Student Enrollment', f"{data['Total AAFTE* Enrollment (ENROLLMENT)'].sum() - filtered_data['Total AAFTE* Enrollment (ENROLLMENT)'].sum():,.0f}", delta=f"-{filtered_data['Total AAFTE* Enrollment (ENROLLMENT)'].sum():,.0f}")
+col3.metric("Students' Assignments Unchanged", f"{data['Total AAFTE* Enrollment (ENROLLMENT)'].sum() - filtered_data['Total AAFTE* Enrollment (ENROLLMENT)'].sum():,.0f}", delta=f"-{filtered_data['Total AAFTE* Enrollment (ENROLLMENT)'].sum():,.0f}")
 col4.metric('Schools Under 75% Capacity', f"{len(data[data['Capacity Percent'] < 0.75])-len(filtered_data[filtered_data['Capacity Percent'] < 0.75])}", delta=f"-{len(filtered_data[filtered_data['Capacity Percent'] < 0.75])}", delta_color="inverse")
 col5.metric('Schools Over 100% Capacity', f"{len(data[data['Capacity Percent'] > 1.0])-len(filtered_data[filtered_data['Capacity Percent'] > 1.0])}", delta=f"-{len(filtered_data[filtered_data['Capacity Percent'] > 1.0])}", delta_color="inverse")
 
@@ -313,6 +308,12 @@ high_range_color = 'darkblue'
 #closed_school_color = st.selectbox('Closed School Color', color_options, index=color_options.index('black'))
 closed_school_color = 'red'
 
+before = reallocate_student_counts(counts, matrix, [])
+closed_schools = pd.array(filtered_data.index)
+after = reallocate_student_counts(counts, matrix, closed_schools)
+data['Enrollment from Redistribution'] = (after-before).astype(int)
+data['Total Enrollment'] = (data['Total AAFTE* Enrollment (ENROLLMENT)'] + data['Enrollment from Redistribution']).astype(int)
+data['Redistribution Capacity'] = (data['Total Enrollment'] / data['Capacity']).astype(float)
 
 # Add all schools to the map with different colors
 try:
@@ -321,14 +322,16 @@ try:
         folium.Marker(
             location=[row['latitude'], row['longitude']],
             popup=f"{row['School']} ({row['Capacity Percent']*100:.0f}%)",
-            icon=folium.Icon(color=color)
+            icon=folium.Icon(icon='None',color=color)
         ).add_to(n)
     for _, row in data.iterrows():
         color = closed_school_color if row['School'] in filtered_data['School'].values else determine_color(row['Redistribution Capacity'])
+        icon = folium.Icon(icon='None', color=color) if row['Enrollment from Redistribution'] == 0 else folium.Icon(color=color)
         folium.Marker(
             location=[row['latitude'], row['longitude']],
             popup=f"{row['School']} ({row['Capacity Percent']*100:.0f}% -> {row['Redistribution Capacity']*100:.0f}%)",
-            icon=folium.Icon(color=color)
+            #icon=folium.Icon(icon='none', color='blue', icon_color='white'),
+            icon=icon
         ).add_to(m)
 except:
     st.write("")
