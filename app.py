@@ -393,10 +393,5 @@ ax.set_ylabel('Number of Schools')
 
 
 st.subheader("All Data:")
-data['Capacity Percent'] = data['Capacity Percent'].map(lambda x: float(f"{x*100.0:2.1f}"))
-
-data['Redistribution Capacity'] = data['Redistribution Capacity'].map(lambda x: float(f"{x*100.0:2.1f}"))
-
-
 st.dataframe(data[['School','Use','Total Budget (BUDGET)','Total AAFTE* Enrollment (ENROLLMENT)','Enrollment from Redistribution','Total Enrollment','Capacity','Capacity Percent','Redistribution Capacity']].rename(columns={'Total AAFTE* Enrollment (ENROLLMENT)':'Enrollment', 'Capacity Percent':'Starting Capacity Percent','Redistribution Capacity':'Ending Capacity Percent','Capacity':'Building Capacity'}), width=10000)
 
