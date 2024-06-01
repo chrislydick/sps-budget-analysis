@@ -79,7 +79,7 @@ def reallocate_student_counts(student_counts, redistribution_matrix, closed_scho
 
 # Load data
 data = pd.read_csv('data/performance_data_2023.csv')
-matrix = pd.read_csv('data/redistribution_matrix.csv')
+matrix = pd.read_csv('data/redistribution_matrix.csv',index_col=0)
 counts = data[['Total AAFTE* Enrollment (ENROLLMENT)']].transpose().values[0]
 
 
@@ -108,15 +108,11 @@ data.drop(columns='Year', inplace=True)
 data = data.rename(columns={'Latitude': 'latitude', 'Longitude': 'longitude'})
 
 # Title
-<<<<<<< HEAD
+
 st.title('Simulation of School Closures in Seattle Public Schools 2025+')
 st.write('Seattle Public Schools (SPS) has initiated a program dubbed as <a href="https://www.seattleschools.org/resources/well-resourced-schools/">Well-Resourced Schools</a>, which began upon board approval for analysis of up to 20 elementary schools to be closed in Seattle. The hope is to close a growing budget gap in excess of $100M/year and increasing from years 2026+. This analysis utilizes <a href="https://github.com/chrislydick/sps-budget-analysis/tree/main/data">publicly available data</a> in order to understand outcomes of potential school closures. This data and analysis is provided for informational purposes only and is not intended to be a recommendation for or against any specific school closure. All code and data is available on <a href="https://github.com/chrislydick/sps-budget-analysis">GitHub here</a>.', unsafe_allow_html=True)
 st.write('Author Information <a href="https://chrislydick.com">here</a>.', unsafe_allow_html=True)
-=======
-st.title('Simulation of School Closures in Seattle Public Schools')
-st.write('Seattle Public Schools (SPS) has initiated a program dubbed as <a href="https://www.seattleschools.org/resources/well-resourced-schools/">Well-Resourced Schools</a>, which was initiated upon board approval for analysis of up to 20 elementary schools to be closed in Seattle in order to address a growing budget gap in excess of $100M/year. This analysis utilizes <a href="https://github.com/chrislydick/sps-budget-analysis/tree/main/data">publicly available data</a> in order to understand outcomes of potential school closures. This data and analysis is provided for informational purposes only and is not intended to be a recommendation for or against any specific school closure. All code and data is available on <a href="https://github.com/chrislydick/sps-budget-analysis">GitHub here</a>.', unsafe_allow_html=True)
 st.write('')
->>>>>>> parent of a22b5d8 (Update app.py)
 st.write('')
 
 
@@ -390,5 +386,9 @@ ax.set_ylabel('Number of Schools')
 
 
 st.subheader("All Data:")
-st.dataframe(data[['School','Use','Total Budget (BUDGET)','Total AAFTE* Enrollment (ENROLLMENT)','Enrollment from Redistribution','Total Enrollment','Capacity','Capacity Percent','Redistribution Capacity']].rename(columns={'Total AAFTE* Enrollment (ENROLLMENT)':'Enrollment', 'Capacity Percent':'Starting Capacity Percent','Redistribution Capacity':'Ending Capacity Percent','Capacity':'Building Capacity'}), width=10000)
+data['Capacity Percent'] = data['Capacity Percent'].map(lambda x: float(f"{x*100.0:2.1f}"))
 
+data['Redistribution Capacity'] = data['Redistribution Capacity'].map(lambda x: float(f"{x*100.0:2.1f}"))
+
+
+st.dataframe(data[['School','Use','Total Budget (BUDGET)','Total AAFTE* Enrollment (ENROLLMENT)','Enrollment from Redistribution','Total Enrollment','Capacity','Capacity Percent','Redistribution Capacity']].rename(columns={'Total AAFTE* Enrollment (ENROLLMENT)':'Enrollment', 'Capacity Percent':'Starting Capacity Percent','Redistribution Capacity':'Ending Capacity Percent','Capacity':'Building Capacity'}), width=10000)
