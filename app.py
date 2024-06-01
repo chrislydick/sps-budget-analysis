@@ -211,10 +211,64 @@ if 'School Type' in selected_options:
 else:
     school_type = data['Use'].unique()
 
-    
+
 
 
 manual_school = st.sidebar.multiselect('Manually Select Additional Schools to Close:', data['School'].unique())
+st.sidebar.write("")
+st.sidebar.write("")
+st.sidebar.write("")
+st.sidebar.write("")
+st.sidebar.write("")
+st.sidebar.write("Alternativly, load an example below:")
+st.sidebar.write("<h5>Schools with Enrollment > 300 and Capacity > 65%</h5>", unsafe_allow_html=True)
+l1 = st.sidebar.button('Load', key='1')
+if l1:
+    selected_landmark = ['Y', 'N', 'P']
+    budget_range = (0, 1000000)
+    excess_budget_range = (0, 1000)
+    budget_efficiency_range = (0, 1000)
+    distance_range = (0, 10)
+    disadvantage_score_range = (0, 100)
+    enrollment_range = (300, 1000000)
+    capacity = (0.65, 1.0)
+    building_condition_score = (0, 100)
+    school_type = ['K-12']
+    manual_school = []
+st.write("")
+st.write("")
+st.sidebar.write("<h5>Schools with Excess Budget per Student > 1000, Capacity > 65%, Building Condition as Good or Fair</h5>", unsafe_allow_html=True)
+l2 = st.sidebar.button('Load', key='2')
+if l2:
+    selected_landmark = ['Y', 'N', 'P']
+    budget_range = (0, 1000000)
+    excess_budget_range = (1000, 1000000)
+    budget_efficiency_range = (0, 1000)
+    distance_range = (0, 10)
+    disadvantage_score_range = (0, 100)
+    enrollment_range = (0, 1000000)
+    capacity = (0.65, 1.0)
+    building_condition_score = (60, 100)
+    school_type = ['K-12']
+    manual_school = []
+st.write("")
+st.write("")
+st.sidebar.write("<h5>School type is K-8, within 0.5 miles of another similar school.</h5>", unsafe_allow_html=True)
+l3 = st.sidebar.button('Load', key='3')
+if l3:
+    selected_landmark = ['Y', 'N', 'P']
+    budget_range = (0, 1000000)
+    excess_budget_range = (0, 1000)
+    budget_efficiency_range = (0, 1000)
+    distance_range = (0, 0.5)
+    disadvantage_score_range = (0, 100)
+    enrollment_range = (0, 1000000)
+    capacity = (0.0, 1.0)
+    building_condition_score = (0, 100)
+    school_type = ['K-8']
+    manual_school = []
+    selected_options = ['School Budget','School Type','Building Condition Score', 'Distance to Closest School','Excess Budget per Student', 'Disadvantage Score','Enrollment Total', 'Capacity Total','School Landmark Status']
+
 
 
 # Apply filters
@@ -245,8 +299,6 @@ filtered_data = data[((data['Landmark'].isin(selected_landmark)) &
 
 # Main panel
 
-
-st.subheader('')
 
 before = reallocate_student_counts(counts, matrix, [])
 closed_schools = pd.array(filtered_data.index)
