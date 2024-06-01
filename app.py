@@ -6,7 +6,6 @@ from streamlit_folium import st_folium
 from streamlit.components.v1 import html
 import numpy as np
 
-
 st.set_page_config(layout="wide")
 
 def determine_color(capacity_percent):
@@ -109,20 +108,6 @@ data = data.rename(columns={'Latitude': 'latitude', 'Longitude': 'longitude'})
 
 # Title
 
-st.title('Simulation of School Closures in Seattle Public Schools 2025+')
-st.write('Seattle Public Schools (SPS) has initiated a program dubbed as <a href="https://www.seattleschools.org/resources/well-resourced-schools/">Well-Resourced Schools</a>, which began upon board approval for analysis of up to 20 elementary schools to be closed in Seattle. The hope is to close a growing budget gap in excess of $100M/year and increasing from years 2026+. This analysis utilizes <a href="https://github.com/chrislydick/sps-budget-analysis/tree/main/data">publicly available data</a> in order to understand outcomes of potential school closures. This data and analysis is provided for informational purposes only and is not intended to be a recommendation for or against any specific school closure. All code and data is available on <a href="https://github.com/chrislydick/sps-budget-analysis">GitHub here</a>.', unsafe_allow_html=True)
-st.write('Author Information <a href="https://chrislydick.com">here</a>.', unsafe_allow_html=True)
-st.write('')
-st.write('')
-
-
-
-
-
-
-
-
-
 
 
 # Sidebar for filtering
@@ -130,7 +115,7 @@ st.sidebar.header('Identify Schools to Close by Filters')
 
 
 selected_options =  st.sidebar.multiselect("Metrics to Find Schools to Close...",
-        ['School Budget','School Type','Building Condition Score', 'Distance to Closest School','Excess Budget per Student', 'Disadvantage Score','Enrollment Toal', 'Capacity Total','School Landmark Status'], ['Enrollment Toal', 'Capacity Total'])
+        ['School Budget','School Type','Building Condition Score', 'Distance to Closest School','Excess Budget per Student', 'Disadvantage Score','Enrollment Total', 'Capacity Total','School Landmark Status'], ['Enrollment Total', 'Capacity Total'])
 
 color_options = ['red', 'blue', 'green', 'purple', 'orange', 'darkred', 'lightred', 'beige',
                  'darkblue', 'darkgreen', 'cadetblue', 'darkpurple', 'white', 'pink',
@@ -193,7 +178,7 @@ else:
 
 
 # Total AAFTE Enrollment range filter using sliders
-if 'Enrollment Toal' in selected_options:
+if 'Enrollment Total' in selected_options:
     enrollment_range = st.sidebar.slider("School's total Enrollment Range:", 
                                      min_value=0, 
                                      max_value=int(data['Total AAFTE* Enrollment (ENROLLMENT)'].max()), 
@@ -270,17 +255,29 @@ data['Enrollment from Redistribution'] = (after-before).astype(int)
 data['Total Enrollment'] = (data['Total AAFTE* Enrollment (ENROLLMENT)'] + data['Enrollment from Redistribution']).astype(int)
 data['Redistribution Capacity'] = (data['Total Enrollment'] / data['Capacity']).astype(float)
 
-col1, col2, col3, col4, col5 = st.columns(5)
-col2, col3, col4, col5 = st.columns(4)
 
-#col1.metric('Elementary Budget Unchanged', value=f"${data['Total Budget (BUDGET)'].sum() - filtered_data['Total Budget (BUDGET)'].sum():,.0f}",delta=f"-{filtered_data['Total Budget (BUDGET)'].sum():,.0f}", delta_color="inverse")
-col2.metric('Schools Remaining Open', f"{len(data) - len(filtered_data)}", delta=f"-{len(filtered_data)}", delta_color="inverse")
-col3.metric("Students' Assignments Unchanged", f"{data['Total AAFTE* Enrollment (ENROLLMENT)'].sum() - filtered_data['Total AAFTE* Enrollment (ENROLLMENT)'].sum():,.0f}", delta=f"-{filtered_data['Total AAFTE* Enrollment (ENROLLMENT)'].sum():,.0f}")
-#col4.metric('Schools Under 75% Capacity', f"{len(data[data['Capacity Percent'] < 0.75])-len(filtered_data[filtered_data['Capacity Percent'] < 0.75])}", delta=f"-{len(filtered_data[filtered_data['Capacity Percent'] < 0.75])}", delta_color="inverse")
-col4.metric('Schools Under 75% Capacity', f"{len(data[data['Redistribution Capacity'] < 0.75]) - len(filtered_data['School'])}", delta=f"{-1+len(data[data['Redistribution Capacity'] < 0.75])-len(data[data['Capacity Percent'] < 0.75])}", delta_color="inverse")
-#col5.metric('Schools Over 100% Capacity', f"{len(data[data['Capacity Percent'] > 1.0])-len(filtered_data[filtered_data['Capacity Percent'] > 1.0])}", delta=f"-{len(filtered_data[filtered_data['Capacity Percent'] > 1.0])}", delta_color="inverse")
-col5.metric('Schools Over 100% Capacity', f"{len(data[data['Redistribution Capacity'] > 1.0])}", delta=f"{len(data[data['Redistribution Capacity'] > 1.0])-len(data[data['Capacity Percent'] > 1.0])}", delta_color="inverse")
-#st.write(f"{len(filtered_data[filtered_data['School']])}")
+st.title('Simulation of School Closures in Seattle Public Schools 2025+')
+#st.write('Seattle Public Schools (SPS) has initiated a program dubbed as <a href="https://www.seattleschools.org/resources/well-resourced-schools/">Well-Resourced Schools</a>, which began upon board approval for analysis of up to 20 elementary schools to be closed in Seattle. The hope is to close a growing budget gap in excess of $100M/year and increasing from years 2026+. This analysis utilizes <a href="https://github.com/chrislydick/sps-budget-analysis/tree/main/data">publicly available data</a> in order to understand outcomes of potential school closures. This data and analysis is provided for informational purposes only and is not intended to be a recommendation for or against any specific school closure. All code and data is available on <a href="https://github.com/chrislydick/sps-budget-analysis">GitHub here</a>.', unsafe_allow_html=True)
+st.write('Seattle Public Schools (SPS) has launched the <a href="https://www.seattleschools.org/resources/well-resourced-schools/">Well-Resourced Schools program</a> following board approval to analyze the potential closure of up to 20 elementary schools in Seattle. This initiative aims to address a budget shortfall exceeding $100 million annually, projected to increase from 2026 onward. The analysis <a href="https://github.com/chrislydick/sps-budget-analysis/tree/main/data">leverages publicly available data from SPS</a> to assess the potential outcomes of school closures. The data and analysis are provided for informational purposes only and do not constitute recommendations for or against any specific school closure. All code and data can be accessed on <a href="https://github.com/chrislydick/sps-budget-analysis">GitHub here</a>. Author Information <a href="https://chrislydick.com">here</a>. Contribute to the project <a href="https://github.com/chrislydick/sps-budget-analysis/tree/main/data">here</a>. ', unsafe_allow_html=True)
+st.write('')
+
+col1, col2, col3, col4, col5 = st.columns(5)
+#col2, col3, col4, col5 = st.columns(4)
+
+s_under_75 = len(data[data['Redistribution Capacity'] < 0.75]) - len(filtered_data['School'])
+s_under_75_delta = len(data[data['Redistribution Capacity'] < 0.75])-len(data[data['Capacity Percent'] < 0.75])
+s_over_100 = len(data[data['Redistribution Capacity'] > 1.0])
+s_over_100_delta = len(data[data['Redistribution Capacity'] > 1.0])-len(data[data['Capacity Percent'] > 1.0])
+s_remaining = len(data) - s_over_100 - s_under_75
+s_remaining_delta = abs(s_over_100 - s_under_75)
+
+
+col1.metric('Schools Remaining Open', f"{len(data) - len(filtered_data)}", delta=f"-{len(filtered_data)}", delta_color="inverse")
+col2.metric("Students' Assignments Unchanged", f"{data['Total AAFTE* Enrollment (ENROLLMENT)'].sum() - filtered_data['Total AAFTE* Enrollment (ENROLLMENT)'].sum():,.0f}", delta=f"-{filtered_data['Total AAFTE* Enrollment (ENROLLMENT)'].sum():,.0f}")
+col3.metric('Schools Under 75% Capacity', f"{s_under_75}", delta=f"{s_under_75_delta}", delta_color="inverse")
+col4.metric('Schools Between 75-100% Capacity', f"{s_remaining}", delta=f"{s_remaining_delta}")
+col5.metric('Schools Over 100% Capacity', f"{s_over_100}", delta=f"{s_over_100_delta}", delta_color="inverse")
+
 
 
 
@@ -399,3 +396,4 @@ data['Redistribution Capacity'] = data['Redistribution Capacity'].map(lambda x: 
 
 
 st.dataframe(data[['School','Use','Total Budget (BUDGET)','Total AAFTE* Enrollment (ENROLLMENT)','Enrollment from Redistribution','Total Enrollment','Capacity','Capacity Percent','Redistribution Capacity']].rename(columns={'Total AAFTE* Enrollment (ENROLLMENT)':'Enrollment', 'Capacity Percent':'Starting Capacity Percent','Redistribution Capacity':'Ending Capacity Percent','Capacity':'Building Capacity'}), width=10000)
+
