@@ -111,7 +111,7 @@ data = data.rename(columns={'Latitude': 'latitude', 'Longitude': 'longitude'})
 
 
 # Sidebar for filtering
-st.sidebar.header('Identify Schools to Close by Filters')
+st.sidebar.header('Adjust Filters to Identify Schools to Simulate Closing:')
 
 
 selected_options =  st.sidebar.multiselect("Metrics to Find Schools to Close...", 
@@ -254,7 +254,7 @@ def set_example_2():
 
 def set_example_3():
     st.session_state.school_type = ['K-8']
-    st.session_state.distance_range = (0.0, 0.5)
+    st.session_state.distance = (0.0, 0.5)
     st.session_state.selected_options = ['School Type','Distance to Closest School']
 
 st.sidebar.write("")
@@ -262,18 +262,15 @@ st.sidebar.write("")
 st.sidebar.write("")
 st.sidebar.write("")
 st.sidebar.write("")
-st.sidebar.write("Alternativly, load an example below:")
+st.sidebar.header('Use Pre-Loaded Examples Below:')
 st.sidebar.write("<h5>Schools with Enrollment > 300 and Capacity < 75%</h5>", unsafe_allow_html=True)
-l1 = st.sidebar.button('Load', key='example_1', on_click=set_example_1)
-st.write("")
-st.write("")
+l1 = st.sidebar.button('Load Example 1', key='example_1', on_click=set_example_1)
+st.sidebar.write("")
 st.sidebar.write("<h5>Schools with Capacity < 65%, Building Condition as Good or Fair</h5>", unsafe_allow_html=True)
-l2 = st.sidebar.button('Load', key='example_2', on_click=set_example_2)
-st.write("")
-st.write("")
+l2 = st.sidebar.button('Load Example 2', key='example_2', on_click=set_example_2)
+st.sidebar.write("")
 st.sidebar.write("<h5>School type is K-8, within 0.5 miles of another similar school.</h5>", unsafe_allow_html=True)
-l3 = st.sidebar.button('Load', key='example_3', on_click=set_example_3)
-
+l3 = st.sidebar.button('Load Example 3', key='example_3', on_click=set_example_3)
 
 
 # Apply filters
