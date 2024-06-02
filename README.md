@@ -42,3 +42,6 @@ Q7: I see an error. Where can I notify someone about it?
 
 A7: All of this is provided with no warranty, and was done on my own time voluntarily, so take that into account. I've gone through a fairly rigorous quality assurance process to make sure that the data and analyses that people may do with this app are accurate. That said, just let me know if there's a problem. I'll investigate. 
 ***
+Q8: How did you account for only redistributing K-5 students in a K-8 or K-12 school? 
+
+A8: A simple assumption was made on the normalized enrollment for those schools - K-8 were multipled by (6/8 = 3/4), and K-12 were multipled by (6/12 = 1/2), and those numbers were used in this analysis instead of the actual enrollment numbers for those schools.
