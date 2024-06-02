@@ -24,7 +24,7 @@ A2: This was tricky, without specific information on individual students' census
 ***
 Q3: Did you account for multiple closures which may have otherwise re-distributed students to another closed school? 
 
-A3: Yes. That was a fun problem to solve. It's all here in the code, but 
+A3: Yes. That was a fun problem to solve. It's all in the code, within the reallocate_student_counts() functions. Long story short, it's an interative problem to solve, and lends very well to code in order to implement. Some matrix math is utilized to make this easier, and ensure that students aren't lost if there are dependencies between schools which are closed. If you simulate more than 35 schools closing, the tool tends to do some weird things, which would be addressed by adding additional capabilities to this function.
 ***
 Q4: What about naming differenes of the schools between documents? How'd you handle that? 
 
