@@ -241,18 +241,39 @@ if 'building_condition_score' not in st.session_state:
 if 'school_type' not in st.session_state:
     st.session_state['school_type'] = data['Use'].unique()
 
+def reset_all_states():
+    st.session_state.manual_school = []
+    st.session_state.selected_landmark = ['Y','N','P']
+    st.session_state.budget_range = (0, int(data['Total Budget (BUDGET)'].max()))
+    st.session_state.excess_budget_range = (float(data['Excess Budget per Student'].min()), float(data['Excess Budget per Student'].max()))
+    st.session_state.budget_efficiency_range = (float(data['Budget Efficiency'].min()), float(data['Budget Efficiency'].max()))
+    st.session_state.disadvantage_score_range = (0.0, float(data['Disadvantage Score'].max()))
+    st.session_state.distance_range = (0.0, float(data['Distance to Closest School (miles)'].max()))
+    st.session_state.enrollment_range = (0, int(data['Total AAFTE* Enrollment (ENROLLMENT)'].max()))
+    st.session_state.capacity = (0.0, float(data['Capacity Percent'].max()))
+    st.session_state.building_condition_score = (0.0, float(data['Building Condition Score'].max()))
+    st.session_state.school_type = data['Use'].unique()
+
+                                                 
+
+                                       
+
 
 def set_example_1():
+    reset_all_states()
     st.session_state.enrollment_range = (300, 1000)
     st.session_state.capacity = (0, 75)
     st.session_state.selected_options = ['Enrollment Total', 'Capacity Total']
 
 def set_example_2():
+    reset_all_states()
+    st.session_state.enrollment_range = (0, int(data['Total AAFTE* Enrollment (ENROLLMENT)'].max()))
     st.session_state.capacity = (0, 65)
     st.session_state.building_condition_score = (3, 5)
     st.session_state.selected_options = ['Capacity Total', 'Building Condition Score']
 
 def set_example_3():
+    reset_all_states()
     st.session_state.school_type = ['K-8']
     st.session_state.distance = (0.0, 0.5)
     st.session_state.selected_options = ['School Type','Distance to Closest School']
@@ -345,11 +366,19 @@ data_moved = move_column(data_moved, 'Capacity Percent', 4)
 data_moved['Capacity Percent'] = data_moved['Capacity Percent'].map(lambda x: f"{x:.0%}")
 data_moved.rename(columns={'Total AAFTE* Enrollment (ENROLLMENT)':'Enrollment'}, inplace=True)
 
+data_editor_data_1 = data.drop(columns=cluster_columns)
+data_moved_1 = move_column(data_editor_data_1, 'Use', 1)
+data_moved_1 = move_column(data_moved_1, 'Total AAFTE* Enrollment (ENROLLMENT)', 2)
+data_moved_1 = move_column(data_moved_1, 'Enrollment from Redistribution', 3)
+data_moved_1 = move_column(data_moved_1, 'Total Enrollment', 4)
+data_moved_1 = move_column(data_moved_1, 'Capacity', 5)
+data_moved_1 = move_column(data_moved_1, 'Capacity Percent', 6)
+data_moved_1 = move_column(data_moved_1, 'Redistribution Capacity', 7)
+data_moved_1['Redistribution Capacity'] = data_moved_1['Redistribution Capacity'].map(lambda x: f"{x:.0%}")
+data_moved_1['Capacity Percent'] = data_moved_1['Capacity Percent'].map(lambda x: f"{x:.0%}")
+data_moved_1.rename(columns={'Total AAFTE* Enrollment (ENROLLMENT)':'Beginning Enrollment', 'Redistribution Capacity':'Ending Capacity', 'Enrollment from Redistribution':'Additional Students'}, inplace=True)
+data_moved_1 = data_moved_1[data_moved_1['Additional Students'] > 0]
 
-st.subheader('')
-
-st.write('Simulated Schools to Close:')
-st.data_editor(data_moved, use_container_width=True, hide_index=True, width=10000) 
 
 # Map of school locations with different colors for filtered and non-filtered schools
 col1a, col2a = st.columns(2)
@@ -416,6 +445,14 @@ with col2a:
     except:
         st.write("")
 # Plotting
+        
+st.subheader('')
+
+st.write(f'By closing the following {data_moved.shape[0]} schools...')
+st.data_editor(data_moved, use_container_width=True, hide_index=True, width=10000)
+
+st.write(f'You impact these {data_moved_1.shape[0]} schools...')
+st.data_editor(data_moved_1, use_container_width=True, hide_index=True, width=10000)
 ###st.subheader('Budget Efficiency Distribution')
 fig, ax = plt.subplots()
 ax.hist(filtered_data['Budget Efficiency'], bins=20, color='#FF4B4B', edgecolor='black')
@@ -442,12 +479,9 @@ ax.set_ylabel('Number of Schools')
 #ax.legend()
 ###st.pyplot(fig)
 
-
-st.subheader("All Schools:")
-data['Capacity Percent'] = data['Capacity Percent'].map(lambda x: float(f"{x*100.0:2.1f}"))
-
-data['Redistribution Capacity'] = data['Redistribution Capacity'].map(lambda x: float(f"{x*100.0:2.1f}"))
-
-
-st.dataframe(data[['School','Use','Total Budget (BUDGET)','Total AAFTE* Enrollment (ENROLLMENT)','Enrollment from Redistribution','Total Enrollment','Capacity','Capacity Percent','Redistribution Capacity']].rename(columns={'Total AAFTE* Enrollment (ENROLLMENT)':'Enrollment', 'Capacity Percent':'Starting Capacity Percent','Redistribution Capacity':'Ending Capacity Percent','Capacity':'Building Capacity'}), width=10000)
+if st.checkbox('Show All Schools and All Data'):
+    data['Capacity Percent'] = data['Capacity Percent'].map(lambda x: float(f"{x*100.0:2.1f}"))
+    data['Redistribution Capacity'] = data['Redistribution Capacity'].map(lambda x: float(f"{x*100.0:2.1f}"))
+    st.dataframe(data)
+    #st.dataframe(data[['School','Use','Total Budget (BUDGET)','Total AAFTE* Enrollment (ENROLLMENT)','Enrollment from Redistribution','Total Enrollment','Capacity','Capacity Percent','Redistribution Capacity']].rename(columns={'Total AAFTE* Enrollment (ENROLLMENT)':'Enrollment', 'Capacity Percent':'Starting Capacity Percent','Redistribution Capacity':'Ending Capacity Percent','Capacity':'Building Capacity'}), width=10000)
 
