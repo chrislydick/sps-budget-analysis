@@ -339,19 +339,84 @@ st.write('')
 col1, col2, col3, col4, col5 = st.columns(5)
 #col2, col3, col4, col5 = st.columns(4)
 
-s_under_75 = len(data[data['Redistribution Capacity'] < 0.75]) - len(filtered_data['School'])
-s_under_75_delta = len(data[data['Redistribution Capacity'] < 0.75])-len(data[data['Capacity Percent'] < 0.75])
+
+s_under_75 = len(data[data['Redistribution Capacity'] < 0.75]) - len(filtered_data)
+s_under_75_delta = -1+len(data[data['Redistribution Capacity'] < 0.75])-len(data[data['Capacity Percent'] < 0.75])
+# First calculate number of schools which went into this category, then out. 
+
+
+
+data['delta < 75'] = np.where(  
+                                (data['Capacity Percent'] <= 0.75) &\
+                                (data['Redistribution Capacity'] == 0),\
+                                'out','')
+
+data['delta < 75'] = np.where(  
+                                (data['Capacity Percent'] <= 0.75) & \
+                                (data['Redistribution Capacity'] >= 0.75), \
+                                'out', data['delta < 75'])
+
+
+
+
+
+data['delta 75-100'] = np.where(
+                                (data['Capacity Percent'] >= 0.75) & \
+                                (data['Capacity Percent'] <= 1.0) & \
+                                (data['Redistribution Capacity'] == 0), \
+                                'out','')
+
+data['delta 75-100'] = np.where(
+                                (data['Capacity Percent'] >= 0.75) & \
+                                (data['Capacity Percent'] <= 1.0) & \
+                                (data['Redistribution Capacity'] >= 1.0), \
+                                'out',data['delta 75-100'])
+
+data['delta 75-100'] = np.where(
+                                (data['Capacity Percent'] >= 0.75) & \
+                                (data['Capacity Percent'] <= 1.0) & \
+                                (data['Redistribution Capacity'] <= 0.75), \
+                                'out',data['delta 75-100'])
+
+data['delta 75-100'] = np.where(
+                                (data['Capacity Percent'] <= 0.75) & \
+                                (data['Redistribution Capacity'] >= 0.75) & \
+                                (data['Redistribution Capacity'] <= 1.0), \
+                                'in',data['delta 75-100'])
+
+
+
+data['delta > 100'] = np.where(
+                                (data['Capacity Percent'] >= 1.0) & \
+                                (data['Redistribution Capacity'] == 0),\
+                                'out','')
+
+data['delta > 100'] = np.where(
+                                (data['Capacity Percent'] <= 1.0) & \
+                                (data['Redistribution Capacity'] >= 1.0),\
+                                'in',data['delta > 100'])
+
+data['delta closed'] = np.where((data['Redistribution Capacity'] == 0), 'in','')
+
+
 s_over_100 = len(data[data['Redistribution Capacity'] > 1.0])
 s_over_100_delta = len(data[data['Redistribution Capacity'] > 1.0])-len(data[data['Capacity Percent'] > 1.0])
-s_remaining = len(data) - s_over_100 - s_under_75
-s_remaining_delta = abs(s_over_100 - s_under_75)
+s_remaining = len(data) - s_over_100 - s_under_75 - len(filtered_data)
+#s_remaining_delta = abs(s_over_100 - s_under_75)
+# 
+s_remaining_delta = -1 + (len(data.query('`Capacity Percent` >= 0.75 & `Capacity Percent` <= 1.0')))\
+                    - len(data.query('`Redistribution Capacity` >= 0.75 & `Redistribution Capacity` <= 1.0 ')) - len(filtered_data)
 
 
-col1.metric('Schools Remaining Open', f"{len(data) - len(filtered_data)}", delta=f"-{len(filtered_data)}", delta_color="inverse")
-col2.metric("Students' Assignments Unchanged", f"{data['Total AAFTE* Enrollment (ENROLLMENT)'].sum() - filtered_data['Total AAFTE* Enrollment (ENROLLMENT)'].sum():,.0f}", delta=f"-{filtered_data['Total AAFTE* Enrollment (ENROLLMENT)'].sum():,.0f}")
-col3.metric('Schools Under 75% Capacity', f"{s_under_75}", delta=f"{s_under_75_delta}", delta_color="inverse")
-col4.metric('Schools Between 75-100% Capacity', f"{s_remaining}", delta=f"{s_remaining_delta}")
-col5.metric('Schools Over 100% Capacity', f"{s_over_100}", delta=f"{s_over_100_delta}", delta_color="inverse")
+col1.metric("Students' Assignments Unchanged", f"{data['Total AAFTE* Enrollment (ENROLLMENT)'].sum() - filtered_data['Total AAFTE* Enrollment (ENROLLMENT)'].sum():,.0f}", delta=f"-{filtered_data['Total AAFTE* Enrollment (ENROLLMENT)'].sum():,.0f}")
+col2.metric('Schools Remaining Open', f"{len(data) - len(filtered_data)}", delta=f"{-len(data[data['delta closed']=='in'])}", delta_color="inverse")
+col3.metric('Schools Under 75% Capacity', f"{s_under_75}", delta=f"{len(data[data['delta < 75']=='in'])-len(data[data['delta < 75']=='out'])}", delta_color="inverse")
+col4.metric('Schools Between 75-100% Capacity', f"{s_remaining}", delta=f"{len(data[data['delta 75-100']=='in'])-len(data[data['delta 75-100']=='out'])}")
+col5.metric('Schools Over 100% Capacity', f"{s_over_100}", delta=f"{len(data[data['delta > 100']=='in'])-len(data[data['delta > 100']=='out'])}", delta_color="inverse")
+#col2.metric('Schools Remaining Open', f"{len(data) - len(filtered_data)}", delta=f"-{len(filtered_data)}", delta_color="inverse")
+#col3.metric('Schools Under 75% Capacity', f"{s_under_75}", delta=f"{s_under_75_delta}", delta_color="inverse")
+#col4.metric('Schools Between 75-100% Capacity', f"{s_remaining}", delta=f"{s_remaining_delta}")
+#col5.metric('Schools Over 100% Capacity', f"{s_over_100}", delta=f"{s_over_100_delta}", delta_color="inverse")
 
 
 
@@ -363,21 +428,24 @@ data_moved = move_column(data_editor_data, 'Use', 1)
 data_moved = move_column(data_moved, 'Total AAFTE* Enrollment (ENROLLMENT)', 2)
 data_moved = move_column(data_moved, 'Capacity', 3)
 data_moved = move_column(data_moved, 'Capacity Percent', 4)
-data_moved['Capacity Percent'] = data_moved['Capacity Percent'].map(lambda x: f"{x:.0%}")
+data_moved['Capacity Percent'] = data_moved['Capacity Percent'].map(lambda x: f"{x*100:.4}").astype(float)
 data_moved.rename(columns={'Total AAFTE* Enrollment (ENROLLMENT)':'Enrollment'}, inplace=True)
 
 data_editor_data_1 = data.drop(columns=cluster_columns)
 data_moved_1 = move_column(data_editor_data_1, 'Use', 1)
+data_moved_1['Ending Excess Capacity'] = data_moved_1['Capacity'] - data_moved_1['Total Enrollment']
 data_moved_1 = move_column(data_moved_1, 'Total AAFTE* Enrollment (ENROLLMENT)', 2)
 data_moved_1 = move_column(data_moved_1, 'Enrollment from Redistribution', 3)
 data_moved_1 = move_column(data_moved_1, 'Total Enrollment', 4)
 data_moved_1 = move_column(data_moved_1, 'Capacity', 5)
-data_moved_1 = move_column(data_moved_1, 'Capacity Percent', 6)
-data_moved_1 = move_column(data_moved_1, 'Redistribution Capacity', 7)
-data_moved_1['Redistribution Capacity'] = data_moved_1['Redistribution Capacity'].map(lambda x: f"{x:.0%}")
-data_moved_1['Capacity Percent'] = data_moved_1['Capacity Percent'].map(lambda x: f"{x:.0%}")
-data_moved_1.rename(columns={'Total AAFTE* Enrollment (ENROLLMENT)':'Beginning Enrollment', 'Redistribution Capacity':'Ending Capacity', 'Enrollment from Redistribution':'Additional Students'}, inplace=True)
+data_moved_1 = move_column(data_moved_1, 'Ending Excess Capacity', 6)
+data_moved_1 = move_column(data_moved_1, 'Capacity Percent', 7)
+data_moved_1 = move_column(data_moved_1, 'Redistribution Capacity', 8)
+data_moved_1['Redistribution Capacity'] = data_moved_1['Redistribution Capacity'].map(lambda x: f"{x*100:.4}").astype(float)
+data_moved_1['Capacity Percent'] = data_moved_1['Capacity Percent'].map(lambda x: f"{x*100:.4}").astype(float)
+data_moved_1.rename(columns={'Capacity':'Building Capacity','Excess Capacity':'Beginning Excess Capacity','Total AAFTE* Enrollment (ENROLLMENT)':'Beginning Enrollment','Capacity Percent':'Beginning Capacity %', 'Redistribution Capacity':'Ending Capacity %', 'Enrollment from Redistribution':'Additional Students'}, inplace=True)
 data_moved_1 = data_moved_1[data_moved_1['Additional Students'] > 0]
+data_moved_1['Ending Capacity %'] = data_moved_1['Ending Capacity %'].astype(int)
 
 
 # Map of school locations with different colors for filtered and non-filtered schools
