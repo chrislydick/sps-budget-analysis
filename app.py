@@ -114,8 +114,8 @@ data = data.rename(columns={'Latitude': 'latitude', 'Longitude': 'longitude'})
 st.sidebar.header('Identify Schools to Close by Filters')
 
 
-selected_options =  st.sidebar.multiselect("Metrics to Find Schools to Close...",
-        ['School Budget','School Type','Building Condition Score', 'Distance to Closest School','Excess Budget per Student', 'Disadvantage Score','Enrollment Total', 'Capacity Total','School Landmark Status'], ['Enrollment Total', 'Capacity Total'])
+selected_options =  st.sidebar.multiselect("Metrics to Find Schools to Close...", 
+                                           ['School Budget','School Type','Building Condition Score', 'Distance to Closest School','Excess Budget per Student', 'Disadvantage Score','Enrollment Total', 'Capacity Total','School Landmark Status'], ['Enrollment Total', 'Capacity Total'], key='selected_options')
 
 color_options = ['red', 'blue', 'green', 'purple', 'orange', 'darkred', 'lightred', 'beige',
                  'darkblue', 'darkgreen', 'cadetblue', 'darkpurple', 'white', 'pink',
@@ -125,13 +125,13 @@ color_options = ['red', 'blue', 'green', 'purple', 'orange', 'darkred', 'lightre
 # Landmark status filter
 landmark_options = ['Y', 'N', 'P']
 if 'School Landmark Status' in selected_options:
-    selected_landmark = st.sidebar.multiselect("School's Landmark Status:", options=landmark_options, default=landmark_options)
+    selected_landmark = st.sidebar.multiselect("School's Landmark Status:", options=landmark_options, default=landmark_options, key='landmark')
 else:
     selected_landmark = landmark_options
 
 # Budget range filter using sliders
 if 'School Budget' in selected_options:
-    budget_range = st.sidebar.slider("School's Budget Range:", 
+    budget_range = st.sidebar.slider("School's Budget Range:", key='budget',
                                  min_value=0, 
                                  max_value=int(data['Total Budget (BUDGET)'].max()), 
                                  value=(0, int(data['Total Budget (BUDGET)'].max())),format='$%d')
@@ -140,7 +140,7 @@ else:
 
 # Excess Budget per Student filter using sliders
 if 'Excess Budget per Student' in selected_options:
-    excess_budget_range = st.sidebar.slider("School's Excess Budget per Student Range:", 
+    excess_budget_range = st.sidebar.slider("School's Excess Budget per Student Range:", key='excess_budget',
                                         min_value=float(data['Excess Budget per Student'].min()), 
                                         max_value=float(data['Excess Budget per Student'].max()), 
                                         value=(float(data['Excess Budget per Student'].min()), float(data['Excess Budget per Student'].max())),format='$%d')
@@ -149,7 +149,7 @@ else:
 
 # Budget Efficiency filter using sliders
 if 'Budget Efficiency' in selected_options:
-    budget_efficiency_range = st.sidebar.slider("School's Budget per Student Range:", 
+    budget_efficiency_range = st.sidebar.slider("School's Budget per Student Range:", key='budget_efficiency',
                                             min_value=float(data['Budget Efficiency'].min()), 
                                             max_value=float(data['Budget Efficiency'].max()), 
                                             value=(float(data['Budget Efficiency'].min()), float(data['Budget Efficiency'].max())),format='$%d')
@@ -159,7 +159,7 @@ else:
 
 # Disadvantage Score filter using sliders
 if 'Disadvantage Score' in selected_options:
-    disadvantage_score_range = st.sidebar.slider("School's Disadvantage Score Range:", 
+    disadvantage_score_range = st.sidebar.slider("School's Disadvantage Score Range:", key='disadvantage_score', 
                                              min_value=0.0, 
                                              max_value=float(data['Disadvantage Score'].max()), 
                                              value=(0.0, float(data['Disadvantage Score'].max())))
@@ -169,7 +169,7 @@ else:
 
 # Distance to nearest school using sliders
 if 'Distance to Closest School' in selected_options:
-    distance_range = st.sidebar.slider("School's Distance to Closest School Range:", 
+    distance_range = st.sidebar.slider("School's Distance to Closest School Range:", key='distance',
                                      min_value=0.0, 
                                      max_value=float(data['Distance to Closest School (miles)'].max()), 
                                      value=(0.0, float(data['Distance to Closest School (miles)'].max())))
@@ -179,7 +179,7 @@ else:
 
 # Total AAFTE Enrollment range filter using sliders
 if 'Enrollment Total' in selected_options:
-    enrollment_range = st.sidebar.slider("School's total Enrollment Range:", 
+    enrollment_range = st.sidebar.slider("School's total Enrollment Range:", key='enrollment',
                                      min_value=0, 
                                      max_value=int(data['Total AAFTE* Enrollment (ENROLLMENT)'].max()), 
                                      value=(0,300),format='%i')
@@ -189,7 +189,7 @@ else:
 
 # School Capacity range filter using sliders
 if 'Capacity Total' in selected_options:
-    capacity = st.sidebar.slider("School's Capacity Percent Range:", 
+    capacity = st.sidebar.slider("School's Capacity Percent Range:", key='capacity',
                                      min_value=0.0, 
                                      max_value=float(data['Capacity Percent'].max()*100.0), 
                                      value=(0.0, 65.0), format='%i%%')
@@ -199,7 +199,7 @@ else:
 
 # Building Condition Score filter using sliders
 if 'Building Condition Score' in selected_options:
-    building_condition_score = st.sidebar.slider("School's Building Condition Score Range:", 
+    building_condition_score = st.sidebar.slider("School's Building Condition Score Range:", key='building_condition_score', 
                                      min_value=0.0, 
                                      max_value=float(data['Building Condition Score'].max()), 
                                      value=(0.0, float(data['Building Condition Score'].max())))
@@ -207,30 +207,72 @@ else:
     building_condition_score = (0.0, float(data['Building Condition Score'].max()))
 
 if 'School Type' in selected_options:
-    school_type = st.sidebar.multiselect('Select School Type', data['Use'].unique(), default=data['Use'].unique())
+    school_type = st.sidebar.multiselect('Select School Type', data['Use'].unique(), default=data['Use'].unique(), key='school_type')
 else:
     school_type = data['Use'].unique()
 
 
 
 
-manual_school = st.sidebar.multiselect('Manually Select Additional Schools to Close:', data['School'].unique())
-#st.sidebar.write("")
-#st.sidebar.write("")
-#st.sidebar.write("")
-#st.sidebar.write("")
-#st.sidebar.write("")
-#st.sidebar.write("Alternativly, load an example below:")
-#st.sidebar.write("<h5>Schools with Enrollment > 300 and Capacity > 65%</h5>", unsafe_allow_html=True)
-#l1 = st.sidebar.button('Load', key='example_1')
-#st.write("")
-#st.write("")
-#st.sidebar.write("<h5>Schools with Excess Budget per Student > 1000, Capacity > 65%, Building Condition as Good or Fair</h5>", unsafe_allow_html=True)
-#l2 = st.sidebar.button('Load', key='example_2')
-#st.write("")
-#st.write("")
-#st.sidebar.write("<h5>School type is K-8, within 0.5 miles of another similar school.</h5>", unsafe_allow_html=True)
-#l3 = st.sidebar.button('Load', key='example_3')
+manual_school = st.sidebar.multiselect('Manually Select Additional Schools to Close:', data['School'].unique(), key='manual_school')
+
+
+
+if 'manual_school' not in st.session_state:
+    st.session_state['manual_school'] = []
+if 'selected_landmark' not in st.session_state:
+    st.session_state['selected_landmark'] = []
+if 'budget_range' not in st.session_state:
+    st.session_state['budget_range'] = (0, int(data['Total Budget (BUDGET)'].max()))
+if 'excess_budget_range' not in st.session_state:
+    st.session_state['excess_budget_range'] = (float(data['Excess Budget per Student'].min()), float(data['Excess Budget per Student'].max()))
+if 'budget_efficiency_range' not in st.session_state:
+    st.session_state['budget_efficiency_range'] = (float(data['Budget Efficiency'].min()), float(data['Budget Efficiency'].max()))
+if 'disadvantage_score_range' not in st.session_state:
+    st.session_state['disadvantage_score_range'] = (0.0, float(data['Disadvantage Score'].max()))
+if 'distance_range' not in st.session_state:
+    st.session_state['distance_range'] = (0.0, float(data['Distance to Closest School (miles)'].max()))
+if 'enrollment_range' not in st.session_state:
+    st.session_state['enrollment_range'] = (0, int(data['Total AAFTE* Enrollment (ENROLLMENT)'].max()))
+if 'capacity' not in st.session_state:
+    st.session_state['capacity'] = (0.0, float(data['Capacity Percent'].max()))
+if 'building_condition_score' not in st.session_state:
+    st.session_state['building_condition_score'] = (0.0, float(data['Building Condition Score'].max()))
+if 'school_type' not in st.session_state:
+    st.session_state['school_type'] = data['Use'].unique()
+
+
+def set_example_1():
+    st.session_state.enrollment_range = (300, 1000)
+    st.session_state.capacity = (0, 75)
+    st.session_state.selected_options = ['Enrollment Total', 'Capacity Total']
+
+def set_example_2():
+    st.session_state.capacity = (0, 65)
+    st.session_state.building_condition_score = (3, 5)
+    st.session_state.selected_options = ['Capacity Total', 'Building Condition Score']
+
+def set_example_3():
+    st.session_state.school_type = ['K-8']
+    st.session_state.distance_range = (0.0, 0.5)
+    st.session_state.selected_options = ['School Type','Distance to Closest School']
+
+st.sidebar.write("")
+st.sidebar.write("")
+st.sidebar.write("")
+st.sidebar.write("")
+st.sidebar.write("")
+st.sidebar.write("Alternativly, load an example below:")
+st.sidebar.write("<h5>Schools with Enrollment > 300 and Capacity < 75%</h5>", unsafe_allow_html=True)
+l1 = st.sidebar.button('Load', key='example_1', on_click=set_example_1)
+st.write("")
+st.write("")
+st.sidebar.write("<h5>Schools with Capacity < 65%, Building Condition as Good or Fair</h5>", unsafe_allow_html=True)
+l2 = st.sidebar.button('Load', key='example_2', on_click=set_example_2)
+st.write("")
+st.write("")
+st.sidebar.write("<h5>School type is K-8, within 0.5 miles of another similar school.</h5>", unsafe_allow_html=True)
+l3 = st.sidebar.button('Load', key='example_3', on_click=set_example_3)
 
 
 
