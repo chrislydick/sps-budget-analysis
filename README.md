@@ -45,3 +45,7 @@ A7: All of this is provided with no warranty, and was done on my own time volunt
 Q8: How did you account for only redistributing K-5 students in a K-8 or K-12 school? 
 
 A8: A simple assumption was made on the normalized enrollment and capacity for those schools - K-8 were multipled by (0.75), and K-12 were multipled by (0.50), and those numbers were used in this analysis instead of the actual enrollment numbers and capacities for those schools. Other numbers for those schools, such as budget were not normalized.
+***
+Q9: Why is this app called SPS Budget Analysis 2023? 
+
+A9: Yeah, I should consider renaming it. It uses 2023 data. And, started as a budget analysis at first. 
