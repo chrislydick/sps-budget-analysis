@@ -348,13 +348,13 @@ s_under_75_delta = -1+len(data[data['Redistribution Capacity'] < 0.75])-len(data
 
 
 data['delta < 75'] = np.where(  
-                                (round(100*data['Capacity Percent']).astype(int) < 75) &\
-                                (round(100*data['Redistribution Capacity']).astype(int) == 0),\
+                                (round(100*data['Capacity Percent'],0) < 75) &\
+                                (round(100*data['Redistribution Capacity'],0) == 0),\
                                 'out','')
 
 data['delta < 75'] = np.where(  
-                                (round(100*data['Capacity Percent']).astype(int) < 75) & \
-                                (round(100*data['Redistribution Capacity']).astype(int) > 75), \
+                                (round(100*data['Capacity Percent'],0) <= 75) & \
+                                (round(100*data['Redistribution Capacity'],0) >= 75), \
                                 'out', data['delta < 75'])
 
 
@@ -362,39 +362,39 @@ data['delta < 75'] = np.where(
 
 
 data['delta 75-100'] = np.where(
-                                (round(100*data['Capacity Percent']).astype(int) > 75) & \
-                                (round(100*data['Capacity Percent']).astype(int) < 100) & \
-                                (round(100*data['Redistribution Capacity']).astype(int) == 0), \
+                                (round(100*data['Capacity Percent'],0) >= 75) & \
+                                (round(100*data['Capacity Percent'],0) <= 100) & \
+                                (round(100*data['Redistribution Capacity'],0) == 0), \
                                 'out','')
 
 data['delta 75-100'] = np.where(
-                                (round(100*data['Capacity Percent']).astype(int) > 75) & \
-                                (round(100*data['Capacity Percent']).astype(int) < 100) & \
-                                (round(100*data['Redistribution Capacity']).astype(int) > 100), \
+                                (round(100*data['Capacity Percent'],0) >= 75) & \
+                                (round(100*data['Capacity Percent'],0) <= 100) & \
+                                (round(100*data['Redistribution Capacity'],0) > 100), \
                                 'out',data['delta 75-100'])
 
 data['delta 75-100'] = np.where(
-                                (round(100*data['Capacity Percent']).astype(int) > 75) & \
-                                (round(100*data['Capacity Percent']).astype(int) < 100) & \
-                                (round(100*data['Redistribution Capacity']).astype(int) < 75), \
+                                (round(100*data['Capacity Percent'],0) >= 75) & \
+                                (round(100*data['Capacity Percent'],0) <= 100) & \
+                                (round(100*data['Redistribution Capacity'],0) <= 75), \
                                 'out',data['delta 75-100'])
 
 data['delta 75-100'] = np.where(
-                                (round(100*data['Capacity Percent']).astype(int) < 75) & \
-                                (round(100*data['Redistribution Capacity']).astype(int) > 75) & \
-                                (round(100*data['Redistribution Capacity']).astype(int) < 100), \
+                                (round(100*data['Capacity Percent'],0) <= 75) & \
+                                (round(100*data['Redistribution Capacity'],0) >= 75) & \
+                                (round(100*data['Redistribution Capacity'],0) <= 100), \
                                 'in',data['delta 75-100'])
 
 
 
 data['delta > 100'] = np.where(
-                                (round(100*data['Capacity Percent']).astype(int) > 100) & \
-                                (round(100*data['Redistribution Capacity']).astype(int) == 0),\
+                                (round(100*data['Capacity Percent'],0) >= 100) & \
+                                (round(100*data['Redistribution Capacity'],0) == 0),\
                                 'out','')
 
 data['delta > 100'] = np.where(
-                                (round(100*data['Capacity Percent']).astype(int) < 100) & \
-                                (round(100*data['Redistribution Capacity']).astype(int) > 100),\
+                                (round(100*data['Capacity Percent'],0) <= 100) & \
+                                (round(100*data['Redistribution Capacity'],0) > 100),\
                                 'in',data['delta > 100'])
 
 data['delta closed'] = np.where((data['Redistribution Capacity'] == 0), 'in','')
