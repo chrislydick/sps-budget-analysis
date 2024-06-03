@@ -115,7 +115,7 @@ st.sidebar.header('Adjust Filters to Identify Schools to Simulate Closing:')
 
 
 selected_options =  st.sidebar.multiselect("Metrics to Find Schools to Close...", 
-                                           ['School Budget','School Type','Building Condition Score', 'Distance to Closest School','Excess Budget per Student', 'Disadvantage Score','Enrollment Total', 'Capacity Total','School Landmark Status'], ['Enrollment Total', 'Capacity Total'], key='selected_options')
+                                           ['Building Capacity','School Budget','School Type','Building Condition Score', 'Distance to Closest School','Excess Budget per Student', 'Disadvantage Score','Enrollment Total', 'Capacity Total','School Landmark Status'], ['Enrollment Total', 'Capacity Total'], key='selected_options')
 
 color_options = ['red', 'blue', 'green', 'purple', 'orange', 'darkred', 'lightred', 'beige',
                  'darkblue', 'darkgreen', 'cadetblue', 'darkpurple', 'white', 'pink',
@@ -186,10 +186,17 @@ if 'Enrollment Total' in selected_options:
 else:
     enrollment_range = (0, int(data['Total AAFTE* Enrollment (ENROLLMENT)'].max()))
 
+if 'Building Capacity' in selected_options:
+    capacity_range = st.sidebar.slider("School's Capacity Range:", key='capacity',
+                                     min_value=0, 
+                                     max_value=int(data['Capacity'].max()), 
+                                     value=(0, 300),format='%i')
+else:
+    capacity_range = (0, int(data['Capacity'].max()))
 
 # School Capacity range filter using sliders
 if 'Capacity Total' in selected_options:
-    capacity = st.sidebar.slider("School's Capacity Percent Range:", key='capacity',
+    capacity = st.sidebar.slider("School's Capacity Percent Range:", key='building capacity',
                                      min_value=0.0, 
                                      max_value=float(data['Capacity Percent'].max()*100.0), 
                                      value=(0.0, 65.0), format='%i%%')
@@ -310,8 +317,11 @@ filtered_data = data[((data['Landmark'].isin(selected_landmark)) &
                      (data['Total AAFTE* Enrollment (ENROLLMENT)'] <= enrollment_range[1]) & 
                      (data['Capacity Percent'] >= capacity[0]) & 
                      (data['Capacity Percent'] <= capacity[1]) &
+                     (data['Capacity'] >= capacity_range[0]) &
+                     (data['Capacity'] <= capacity_range[1]) &
                      (data['Building Condition Score'] >= building_condition_score[0]) &
                      (data['Building Condition Score'] <= building_condition_score[1]) &
+                    
                         (data['Use'].isin(school_type))
                      ) |
                      (data['School'].isin(manual_school)) 
