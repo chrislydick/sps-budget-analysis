@@ -187,7 +187,7 @@ else:
     enrollment_range = (0, int(data['Total AAFTE* Enrollment (ENROLLMENT)'].max()))
 
 if 'Building Capacity' in selected_options:
-    capacity_range = st.sidebar.slider("School's Capacity Range:", key='capacity',
+    capacity_range = st.sidebar.slider("School's Capacity Range:", key='building_capacity',
                                      min_value=0, 
                                      max_value=int(data['Capacity'].max()), 
                                      value=(0, 300),format='%i')
@@ -247,6 +247,8 @@ if 'building_condition_score' not in st.session_state:
     st.session_state['building_condition_score'] = (0.0, float(data['Building Condition Score'].max()))
 if 'school_type' not in st.session_state:
     st.session_state['school_type'] = data['Use'].unique()
+if 'building_capacity' not in st.session_state:
+    st.session_state['building_capacity'] = (0, int(data['Capacity'].max()))
 
 def reset_all_states():
     st.session_state.manual_school = []
@@ -260,6 +262,7 @@ def reset_all_states():
     st.session_state.capacity = (0.0, float(data['Capacity Percent'].max()))
     st.session_state.building_condition_score = (0.0, float(data['Building Condition Score'].max()))
     st.session_state.school_type = data['Use'].unique()
+    st.session_state.building_capacity = (0, int(data['Capacity'].max()))
 
                                                  
 
@@ -268,7 +271,7 @@ def reset_all_states():
 
 def set_example_1():
     reset_all_states()
-    st.session_state.enrollment_range = (300, 1000)
+    st.session_state.enrollment_range = (0, 300)
     st.session_state.capacity = (0, 75)
     st.session_state.selected_options = ['Enrollment Total', 'Capacity Total']
 
@@ -285,6 +288,14 @@ def set_example_3():
     st.session_state.distance = (0.0, 0.5)
     st.session_state.selected_options = ['School Type','Distance to Closest School']
 
+
+def set_example_4():
+    reset_all_states()
+    st.session_state.enrollment_range = (0, 300)
+    st.session_state.school_type = ['K-8','E']
+    st.session_state.building_capacity = (0, 300)
+    st.session_state.selected_options = ['School Type','Enrollment Total', 'Building Capacity']
+
 st.sidebar.write("")
 st.sidebar.write("")
 st.sidebar.write("")
@@ -299,6 +310,9 @@ l2 = st.sidebar.button('Load Example 2', key='example_2', on_click=set_example_2
 st.sidebar.write("")
 st.sidebar.write("<h5>School type is K-8, within 0.5 miles of another similar school.</h5>", unsafe_allow_html=True)
 l3 = st.sidebar.button('Load Example 3', key='example_3', on_click=set_example_3)
+st.sidebar.write("")
+st.sidebar.write("<h5>School type is K-8 or E, Building Capacity and Enrollment are both below 300.</h5>", unsafe_allow_html=True)
+l3 = st.sidebar.button('Load Example 4', key='example_4', on_click=set_example_4)
 
 
 # Apply filters
