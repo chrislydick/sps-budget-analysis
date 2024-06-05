@@ -13,34 +13,7 @@ import pathlib
 
 st.set_page_config(layout="wide")
 
-GA_ID = "google_analytics"
-GA_SCRIPT = """
-<!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-WC85WK7KYB"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
 
-  gtag('config', 'G-WC85WK7KYB');
-</script>
-"""
-
-
-
-def inject_ga():
-    
-    index_path = pathlib.Path(st.__file__).parent / "static" / "index.html"
-    soup = BeautifulSoup(index_path.read_text(), features="html.parser")
-    if not soup.find(id=GA_ID): 
-        bck_index = index_path.with_suffix('.bck')
-        if bck_index.exists():
-            shutil.copy(bck_index, index_path)  
-        else:
-            shutil.copy(index_path, bck_index)  
-        html = str(soup)
-        new_html = html.replace('<head>', '<head>\n' + GA_SCRIPT)
-        index_path.write_text(new_html)
 
 def determine_color(capacity_percent):
     if float(capacity_percent) < 0.75:
@@ -142,15 +115,14 @@ data = data.rename(columns={'Latitude': 'latitude', 'Longitude': 'longitude'})
 
 # Title
 
-#inject_ga()
-st.markdown(GA_SCRIPT, unsafe_allow_html=True)
+
 
 # Sidebar for filtering
 st.sidebar.header('Adjust Filters to Identify Schools to Simulate Closing:')
 
 
 selected_options =  st.sidebar.multiselect("Metrics to Find Schools to Close...", 
-                                           ['Building Capacity','School Budget','School Type','Building Condition Score', 'Distance to Closest School','Excess Budget per Student', 'Disadvantage Score','Enrollment Total', 'Capacity Total','School Landmark Status'], ['Enrollment Total', 'Capacity Total'], key='selected_options')
+                                           ['Building Capacity','School Budget','School Type','Building Condition Score', 'Distance to Closest School','Excess Budget per Student', 'Disadvantage Score','Enrollment Total', 'Capacity Total','School Landmark Status'], ['Enrollment Total'], key='selected_options')
 
 color_options = ['red', 'blue', 'green', 'purple', 'orange', 'darkred', 'lightred', 'beige',
                  'darkblue', 'darkgreen', 'cadetblue', 'darkpurple', 'white', 'pink',
@@ -214,10 +186,10 @@ else:
 
 # Total AAFTE Enrollment range filter using sliders
 if 'Enrollment Total' in selected_options:
-    enrollment_range = st.sidebar.slider("School's total Enrollment Range:", key='enrollment',
+    enrollment_range = st.sidebar.slider("School's total Enrollment Range:", key='enrollment_range',
                                      min_value=0, 
                                      max_value=int(data['Total AAFTE* Enrollment (ENROLLMENT)'].max()), 
-                                     value=(0,300),format='%i')
+                                     value=(0,0),format='%i')
 else:
     enrollment_range = (0, int(data['Total AAFTE* Enrollment (ENROLLMENT)'].max()))
 
@@ -249,14 +221,14 @@ else:
     building_condition_score = (0.0, float(data['Building Condition Score'].max()))
 
 if 'School Type' in selected_options:
-    school_type = st.sidebar.multiselect('Select School Type', data['Use'].unique(), default=data['Use'].unique(), key='school_type')
+    school_type = st.sidebar.multiselect('Select School Type', data['Use'].unique(), default=data['Use'].unique(), key='school_type', placeholder='No School Types Selected')
 else:
     school_type = data['Use'].unique()
 
 
 
 
-manual_school = st.sidebar.multiselect('Manually Select Additional Schools to Close:', data['School'].unique(), key='manual_school')
+manual_school = st.sidebar.multiselect('Manually Select Additional Schools to Close:', data['School'].unique(), key='manual_school', placeholder='No Manual Schools Selected')
 
 
 
@@ -407,11 +379,13 @@ s_under_75_delta = -1+len(data[data['Redistribution Capacity'] < 0.75])-len(data
 
 
 data['delta < 75'] = np.where(  
+                                (round(100*data['Redistribution Capacity'],0) != round(100*data['Capacity Percent'],0)) & \
                                 (round(100*data['Capacity Percent'],0) < 75) &\
                                 (round(100*data['Redistribution Capacity'],0) == 0),\
                                 'out','')
 
 data['delta < 75'] = np.where(  
+                                (round(100*data['Redistribution Capacity'],0) != round(100*data['Capacity Percent'],0)) & \
                                 (round(100*data['Capacity Percent'],0) <= 75) & \
                                 (round(100*data['Redistribution Capacity'],0) >= 75), \
                                 'out', data['delta < 75'])
@@ -421,24 +395,28 @@ data['delta < 75'] = np.where(
 
 
 data['delta 75-100'] = np.where(
+                                (round(100*data['Redistribution Capacity'],0) != round(100*data['Capacity Percent'],0)) & \
                                 (round(100*data['Capacity Percent'],0) >= 75) & \
                                 (round(100*data['Capacity Percent'],0) <= 100) & \
                                 (round(100*data['Redistribution Capacity'],0) == 0), \
                                 'out','')
 
 data['delta 75-100'] = np.where(
+                                (round(100*data['Redistribution Capacity'],0) != round(100*data['Capacity Percent'],0)) & \
                                 (round(100*data['Capacity Percent'],0) >= 75) & \
                                 (round(100*data['Capacity Percent'],0) <= 100) & \
                                 (round(100*data['Redistribution Capacity'],0) > 100), \
                                 'out',data['delta 75-100'])
 
 data['delta 75-100'] = np.where(
+                                (round(100*data['Redistribution Capacity'],0) != round(100*data['Capacity Percent'],0)) & \
                                 (round(100*data['Capacity Percent'],0) >= 75) & \
                                 (round(100*data['Capacity Percent'],0) <= 100) & \
                                 (round(100*data['Redistribution Capacity'],0) <= 75), \
                                 'out',data['delta 75-100'])
 
 data['delta 75-100'] = np.where(
+                                (round(100*data['Redistribution Capacity'],0) != round(100*data['Capacity Percent'],0)) & \
                                 (round(100*data['Capacity Percent'],0) <= 75) & \
                                 (round(100*data['Redistribution Capacity'],0) >= 75) & \
                                 (round(100*data['Redistribution Capacity'],0) <= 100), \
@@ -447,11 +425,13 @@ data['delta 75-100'] = np.where(
 
 
 data['delta > 100'] = np.where(
+                                (round(100*data['Redistribution Capacity'],0) != round(100*data['Capacity Percent'],0)) & \
                                 (round(100*data['Capacity Percent'],0) >= 100) & \
                                 (round(100*data['Redistribution Capacity'],0) == 0),\
                                 'out','')
 
 data['delta > 100'] = np.where(
+                                (round(100*data['Redistribution Capacity'],0) != round(100*data['Capacity Percent'],0)) & \
                                 (round(100*data['Capacity Percent'],0) <= 100) & \
                                 (round(100*data['Redistribution Capacity'],0) > 100),\
                                 'in',data['delta > 100'])
@@ -467,12 +447,31 @@ s_remaining = len(data) - s_over_100 - s_under_75 - len(filtered_data)
 s_remaining_delta = -1 + (len(data.query('`Capacity Percent` >= 0.75 & `Capacity Percent` <= 1.0')))\
                     - len(data.query('`Redistribution Capacity` >= 0.75 & `Redistribution Capacity` <= 1.0 ')) - len(filtered_data)
 
+if filtered_data['Total AAFTE* Enrollment (ENROLLMENT)'].sum() == 0:
+    col1.metric("Students' Assignments Unchanged*", f"{data['Total AAFTE* Enrollment (ENROLLMENT)'].sum() - filtered_data['Total AAFTE* Enrollment (ENROLLMENT)'].sum():,.0f}", delta=f"-{filtered_data['Total AAFTE* Enrollment (ENROLLMENT)'].sum():,.0f}", delta_color="off")
+else: 
+    col1.metric("Students' Assignments Unchanged*", f"{data['Total AAFTE* Enrollment (ENROLLMENT)'].sum() - filtered_data['Total AAFTE* Enrollment (ENROLLMENT)'].sum():,.0f}", delta=f"-{filtered_data['Total AAFTE* Enrollment (ENROLLMENT)'].sum():,.0f}")
 
-col1.metric("Students' Assignments Unchanged*", f"{data['Total AAFTE* Enrollment (ENROLLMENT)'].sum() - filtered_data['Total AAFTE* Enrollment (ENROLLMENT)'].sum():,.0f}", delta=f"-{filtered_data['Total AAFTE* Enrollment (ENROLLMENT)'].sum():,.0f}")
-col2.metric('Schools Remaining Open', f"{len(data) - len(filtered_data)}", delta=f"{-len(data[data['delta closed']=='in'])}", delta_color="inverse")
-col3.metric('Schools Under 75% Capacity', f"{s_under_75}", delta=f"{len(data[data['delta < 75']=='in'])-len(data[data['delta < 75']=='out'])}", delta_color="inverse")
-col4.metric('Schools Between 75-100% Capacity', f"{s_remaining}", delta=f"{len(data[data['delta 75-100']=='in'])-len(data[data['delta 75-100']=='out'])}")
-col5.metric('Schools Over 100% Capacity', f"{s_over_100}", delta=f"{len(data[data['delta > 100']=='in'])-len(data[data['delta > 100']=='out'])}", delta_color="inverse")
+if len(data[data['delta closed']=='in']) == 0:
+    col2.metric('Schools Remaining Open', f"{len(data) - len(filtered_data)}", delta=f"{-len(data[data['delta closed']=='in'])}", delta_color="off")
+else: 
+    col2.metric('Schools Remaining Open', f"{len(data) - len(filtered_data)}", delta=f"{-len(data[data['delta closed']=='in'])}", delta_color="inverse")
+if len(data[data['delta < 75']=='in'])-len(data[data['delta < 75']=='out']) == 0:
+    col3.metric('Schools Under 75% Capacity', f"{s_under_75}", delta=f"{len(data[data['delta < 75']=='in'])-len(data[data['delta < 75']=='out'])}", delta_color="off")
+else: 
+    col3.metric('Schools Under 75% Capacity', f"{s_under_75}", delta=f"{len(data[data['delta < 75']=='in'])-len(data[data['delta < 75']=='out'])}", delta_color="inverse")
+
+if len(data[data['delta 75-100']=='in'])-len(data[data['delta 75-100']=='out']) == 0:
+    col4.metric('Schools Between 75-100% Capacity', f"{s_remaining}", delta=f"{len(data[data['delta 75-100']=='in'])-len(data[data['delta 75-100']=='out'])}", delta_color="off")
+else: 
+    col4.metric('Schools Between 75-100% Capacity', f"{s_remaining}", delta=f"{len(data[data['delta 75-100']=='in'])-len(data[data['delta 75-100']=='out'])}", delta_color="normal")
+
+if len(data[data['delta > 100']=='in'])-len(data[data['delta > 100']=='out']) == 0:
+    col5.metric('Schools Over 100% Capacity', f"{s_over_100}", delta=f"{len(data[data['delta > 100']=='in'])-len(data[data['delta > 100']=='out'])}", delta_color="off")
+else: 
+    col5.metric('Schools Over 100% Capacity', f"{s_over_100}", delta=f"{len(data[data['delta > 100']=='in'])-len(data[data['delta > 100']=='out'])}", delta_color="inverse")
+
+
 #col2.metric('Schools Remaining Open', f"{len(data) - len(filtered_data)}", delta=f"-{len(filtered_data)}", delta_color="inverse")
 #col3.metric('Schools Under 75% Capacity', f"{s_under_75}", delta=f"{s_under_75_delta}", delta_color="inverse")
 #col4.metric('Schools Between 75-100% Capacity', f"{s_remaining}", delta=f"{s_remaining_delta}")
@@ -612,4 +611,4 @@ if st.checkbox('Show All Schools and All Data'):
     st.dataframe(data)
     #st.dataframe(data[['School','Use','Total Budget (BUDGET)','Total AAFTE* Enrollment (ENROLLMENT)','Enrollment from Redistribution','Total Enrollment','Capacity','Capacity Percent','Redistribution Capacity']].rename(columns={'Total AAFTE* Enrollment (ENROLLMENT)':'Enrollment', 'Capacity Percent':'Starting Capacity Percent','Redistribution Capacity':'Ending Capacity Percent','Capacity':'Building Capacity'}), width=10000)
 
-st.write('* Enrollment & Capacity values were normalized for K-8 and K-12 schools so numbers are comparable with Elementary.')
+st.write('<br><br>*<em> Enrollment & Capacity values were normalized for K-8 and K-12 schools so numbers are comparable with Elementary.</em>', unsafe_allow_html=True)
