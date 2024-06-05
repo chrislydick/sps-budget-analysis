@@ -468,7 +468,7 @@ s_remaining_delta = -1 + (len(data.query('`Capacity Percent` >= 0.75 & `Capacity
                     - len(data.query('`Redistribution Capacity` >= 0.75 & `Redistribution Capacity` <= 1.0 ')) - len(filtered_data)
 
 
-col1.metric("Students' Assignments Unchanged", f"{data['Total AAFTE* Enrollment (ENROLLMENT)'].sum() - filtered_data['Total AAFTE* Enrollment (ENROLLMENT)'].sum():,.0f}", delta=f"-{filtered_data['Total AAFTE* Enrollment (ENROLLMENT)'].sum():,.0f}")
+col1.metric("Students' Assignments Unchanged*", f"{data['Total AAFTE* Enrollment (ENROLLMENT)'].sum() - filtered_data['Total AAFTE* Enrollment (ENROLLMENT)'].sum():,.0f}", delta=f"-{filtered_data['Total AAFTE* Enrollment (ENROLLMENT)'].sum():,.0f}")
 col2.metric('Schools Remaining Open', f"{len(data) - len(filtered_data)}", delta=f"{-len(data[data['delta closed']=='in'])}", delta_color="inverse")
 col3.metric('Schools Under 75% Capacity', f"{s_under_75}", delta=f"{len(data[data['delta < 75']=='in'])-len(data[data['delta < 75']=='out'])}", delta_color="inverse")
 col4.metric('Schools Between 75-100% Capacity', f"{s_remaining}", delta=f"{len(data[data['delta 75-100']=='in'])-len(data[data['delta 75-100']=='out'])}")
@@ -612,3 +612,4 @@ if st.checkbox('Show All Schools and All Data'):
     st.dataframe(data)
     #st.dataframe(data[['School','Use','Total Budget (BUDGET)','Total AAFTE* Enrollment (ENROLLMENT)','Enrollment from Redistribution','Total Enrollment','Capacity','Capacity Percent','Redistribution Capacity']].rename(columns={'Total AAFTE* Enrollment (ENROLLMENT)':'Enrollment', 'Capacity Percent':'Starting Capacity Percent','Redistribution Capacity':'Ending Capacity Percent','Capacity':'Building Capacity'}), width=10000)
 
+st.write('* Enrollment & Capacity values were normalized for K-8 and K-12 schools so numbers are comparable with Elementary.')
