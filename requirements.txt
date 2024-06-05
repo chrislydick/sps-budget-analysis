@@ -3,6 +3,4 @@ pandas
 matplotlib
 streamlit_folium
 folium
-beautifulsoup4
-pathlib
-shutil
+
