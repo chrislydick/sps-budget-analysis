@@ -13,8 +13,6 @@ import pathlib
 
 st.set_page_config(layout="wide")
 
-
-
 def determine_color(capacity_percent):
     if float(capacity_percent) < 0.75:
         return low_range_color
@@ -120,8 +118,7 @@ data = data.rename(columns={'Latitude': 'latitude', 'Longitude': 'longitude'})
 # Sidebar for filtering
 st.sidebar.header('Adjust Filters to Identify Schools to Simulate Closing:')
 
-
-selected_options =  st.sidebar.multiselect("Metrics to Find Schools to Close...", 
+selected_options =  st.sidebar.multiselect("Choose any number of metrics for Targeting Schools...", 
                                            ['Building Capacity','School Budget','School Type','Building Condition Score', 'Distance to Closest School','Excess Budget per Student', 'Disadvantage Score','Enrollment Total', 'Capacity Total','School Landmark Status'], ['Enrollment Total'], key='selected_options')
 
 color_options = ['red', 'blue', 'green', 'purple', 'orange', 'darkred', 'lightred', 'beige',
@@ -203,7 +200,7 @@ else:
 
 # School Capacity range filter using sliders
 if 'Capacity Total' in selected_options:
-    capacity = st.sidebar.slider("School's Capacity Percent Range:", key='building capacity',
+    capacity = st.sidebar.slider("School's Capacity Percent Range:", key='capacity',
                                      min_value=0.0, 
                                      max_value=float(data['Capacity Percent'].max()*100.0), 
                                      value=(0.0, 65.0), format='%i%%')
@@ -361,12 +358,10 @@ data['Enrollment from Redistribution'] = (after-before).astype(int)
 data['Total Enrollment'] = (data['Total AAFTE* Enrollment (ENROLLMENT)'] + data['Enrollment from Redistribution']).astype(int)
 data['Redistribution Capacity'] = (data['Total Enrollment'] / data['Capacity']).astype(float)
 
-st.write("")
 st.title('Simulation of School Closures in Seattle Public Schools 2025+')
 #st.write('Seattle Public Schools (SPS) has initiated a program dubbed as <a href="https://www.seattleschools.org/resources/well-resourced-schools/">Well-Resourced Schools</a>, which began upon board approval for analysis of up to 20 elementary schools to be closed in Seattle. The hope is to close a growing budget gap in excess of $100M/year and increasing from years 2026+. This analysis utilizes <a href="https://github.com/chrislydick/sps-budget-analysis/tree/main/data">publicly available data</a> in order to understand outcomes of potential school closures. This data and analysis is provided for informational purposes only and is not intended to be a recommendation for or against any specific school closure. All code and data is available on <a href="https://github.com/chrislydick/sps-budget-analysis">GitHub here</a>.', unsafe_allow_html=True)
 st.write('Seattle Public Schools (SPS) has launched the <a href="https://www.seattleschools.org/resources/well-resourced-schools/">Well-Resourced Schools program</a> following board approval to analyze the potential closure of up to 20 elementary schools in Seattle. This initiative aims to address a budget shortfall exceeding $100 million annually, projected to increase from 2026 onward. The analysis <a href="https://github.com/chrislydick/sps-budget-analysis/tree/main/data">leverages publicly available data from SPS</a> to assess the potential outcomes of school closures. The data and analysis are provided for informational purposes only and do not constitute recommendations for or against any specific school closure. All code and data can be accessed on <a href="https://github.com/chrislydick/sps-budget-analysis">GitHub here</a>. Author Information <a href="https://chrislydick.com">here</a>. Contribute to the project <a href="https://github.com/chrislydick/sps-budget-analysis/tree/main">here</a>. ', unsafe_allow_html=True)
 st.write('FAQ available <a href="https://github.com/chrislydick/sps-budget-analysis?tab=readme-ov-file#faq">here</a>.', unsafe_allow_html=True)
-st.write("")
 st.write("")
 col1, col2, col3, col4, col5 = st.columns(5)
 #col2, col3, col4, col5 = st.columns(4)
