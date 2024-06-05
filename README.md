@@ -5,6 +5,16 @@ See [elementary_school_data_extract.ipynb](elementary_school_data_extract.ipynb)
 
 Streamlit app deployed publicly for analysis [here:](https://sps-budget-analysis-2023.streamlit.app/)
 
+Essentially this app: 
+1. Utilizes numerous collected sample points from various public sources
+2. Normalizes the names to provide consistency and opportunities to compare
+3. Uses linear regression to calculate a likely necessary budget given past performance
+4. Uses k-means to categorize schools into similar groups given numerous dimensions
+5. Simulates and redistributes student counts to other schools based on known relationships between attendance areas and schools
+6. Projects visually (and tabularly) what the anticipated outcome is for other schools, and their future capacities by taking on additional students.
+
+This app comes with no warranty, and makes assumptions given imperfect data made available publicly by SPS.  
+
 ## FAQ:
 Q1: Where did this data come from?
 
