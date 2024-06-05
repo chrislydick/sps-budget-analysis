@@ -3,6 +3,6 @@ pandas
 matplotlib
 streamlit_folium
 folium
-bs4
+beautifulsoup4
 pathlib
 shutil
