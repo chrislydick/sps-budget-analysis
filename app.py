@@ -13,27 +13,26 @@ import pathlib
 
 st.set_page_config(layout="wide")
 
+def google_tag_manager_head():
 
-
-def google_tag_manager(gtm_id):
-    """
-    Embed Google Tag Manager code in Streamlit app.
-
-    Args:
-        gtm_id (str): The Google Tag Manager container ID.
-    """
-    gtm_script = f"""
+    head_script = """
     <!-- Google Tag Manager -->
-    <script>
-    (function(w,d,s,l,i){{w[l]=w[l]||[];w[l].push({{'gtm.start':
-    new Date().getTime(),event:'gtm.js'}});var f=d.getElementsByTagName(s)[0],
-    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-    }})(window,document,'script','dataLayer','{gtm_id}');
-    </script>
-    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id={gtm_id}"
-    height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
-    <!-- End Google Tag Manager -->
+        <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+        new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+        j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+        'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+        })(window,document,'script','dataLayer','GTM-PM8DTJ4F');</script>
+        <!-- End Google Tag Manager -->
+    """
+    html(head_script, height=0)
+
+def google_tag_manager_body():
+ 
+    gtm_script = """
+        <!-- Google Tag Manager (noscript) -->
+        <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-PM8DTJ4F"
+        height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+        <!-- End Google Tag Manager (noscript) -->
     """
     html(gtm_script, height=0)
 
@@ -251,7 +250,8 @@ else:
 
 manual_school = st.sidebar.multiselect('Manually Select Additional Schools to Close:', data['School'].unique(), key='manual_school', placeholder='No Manual Schools Selected')
 
-google_tag_manager('G-WC85WK7KYB')
+google_tag_manager_head()
+google_tag_manager_body()
 
 if 'manual_school' not in st.session_state:
     st.session_state['manual_school'] = []
