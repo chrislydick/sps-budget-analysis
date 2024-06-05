@@ -281,7 +281,7 @@ if 'capacity' not in st.session_state:
 if 'building_condition_score' not in st.session_state:
     st.session_state['building_condition_score'] = (0.0, float(data['Building Condition Score'].max()))
 if 'school_type' not in st.session_state:
-    st.session_state['school_type'] = data['Use'].unique()
+    st.session_state['school_type'] = ['K-12','E','K-8']
 if 'building_capacity' not in st.session_state:
     st.session_state['building_capacity'] = (0, int(data['Capacity'].max()))
 
@@ -296,7 +296,7 @@ def reset_all_states():
     st.session_state.enrollment_range = (0, int(data['Total AAFTE* Enrollment (ENROLLMENT)'].max()))
     st.session_state.capacity = (0.0, float(data['Capacity Percent'].max()))
     st.session_state.building_condition_score = (0.0, float(data['Building Condition Score'].max()))
-    st.session_state.school_type = data['Use'].unique()
+    st.session_state.school_type = ['E','K-12','K-8']
     st.session_state.building_capacity = (0, int(data['Capacity'].max()))
 
                                                  
