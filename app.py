@@ -6,14 +6,15 @@ from streamlit_folium import st_folium
 from streamlit.components.v1 import html
 import numpy as np
 import shutil
+from bs4 import BeautifulSoup
+import pathlib
 
 
 
 st.set_page_config(layout="wide")
 
 GA_ID = "google_analytics"
-
-gtag = '''
+GA_SCRIPT = """
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-WC85WK7KYB"></script>
 <script>
@@ -23,11 +24,23 @@ gtag = '''
 
   gtag('config', 'G-WC85WK7KYB');
 </script>
-'''
+"""
 
 
 
-
+def inject_ga():
+    
+    index_path = pathlib.Path(st.__file__).parent / "static" / "index.html"
+    soup = BeautifulSoup(index_path.read_text(), features="html.parser")
+    if not soup.find(id=GA_ID): 
+        bck_index = index_path.with_suffix('.bck')
+        if bck_index.exists():
+            shutil.copy(bck_index, index_path)  
+        else:
+            shutil.copy(index_path, bck_index)  
+        html = str(soup)
+        new_html = html.replace('<head>', '<head>\n' + GA_SCRIPT)
+        index_path.write_text(new_html)
 
 def determine_color(capacity_percent):
     if float(capacity_percent) < 0.75:
@@ -130,7 +143,7 @@ data = data.rename(columns={'Latitude': 'latitude', 'Longitude': 'longitude'})
 # Title
 
 #inject_ga()
-
+st.markdown(GA_SCRIPT, unsafe_allow_html=True)
 
 # Sidebar for filtering
 st.sidebar.header('Adjust Filters to Identify Schools to Simulate Closing:')
