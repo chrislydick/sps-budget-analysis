@@ -442,7 +442,7 @@ s_remaining_delta = -1 + (len(data.query('`Capacity Percent` >= 0.75 & `Capacity
                     - len(data.query('`Redistribution Capacity` >= 0.75 & `Redistribution Capacity` <= 1.0 ')) - len(filtered_data)
 
 if filtered_data['Total AAFTE* Enrollment (ENROLLMENT)'].sum() == 0:
-    col1.metric("Students' Assignments Unchanged*", f"{data['Total AAFTE* Enrollment (ENROLLMENT)'].sum() - filtered_data['Total AAFTE* Enrollment (ENROLLMENT)'].sum():,.0f}", delta=f"-{filtered_data['Total AAFTE* Enrollment (ENROLLMENT)'].sum():,.0f}", delta_color="off")
+    col1.metric("Students' Assignments Unchanged*", f"{data['Total AAFTE* Enrollment (ENROLLMENT)'].sum() - filtered_data['Total AAFTE* Enrollment (ENROLLMENT)'].sum():,.0f}", delta=f"{filtered_data['Total AAFTE* Enrollment (ENROLLMENT)'].sum():,.0f}", delta_color="off")
 else: 
     col1.metric("Students' Assignments Unchanged*", f"{data['Total AAFTE* Enrollment (ENROLLMENT)'].sum() - filtered_data['Total AAFTE* Enrollment (ENROLLMENT)'].sum():,.0f}", delta=f"-{filtered_data['Total AAFTE* Enrollment (ENROLLMENT)'].sum():,.0f}")
 
