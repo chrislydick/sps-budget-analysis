@@ -58,4 +58,4 @@ A8: A simple assumption was made on the normalized enrollment and capacity for t
 ***
 Q9: Why is this app called SPS Budget Analysis 2023? 
 
-A9: Yeah, I should consider renaming it. It uses 2023 data. And, started as a budget analysis at first. 
+A9: Though this simulates closing schools and impacts therein for 2025 and beyond, it uses 2023 data to do that. I'll probably rename a future version, but the URL would change, and some folks may bookmark this. 
