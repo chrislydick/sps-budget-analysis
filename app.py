@@ -307,6 +307,7 @@ def set_proposed_option_a():
 
 def set_proposed_option_b():
     reset_all_states()
+    st.session_state.school_type = []
     st.manual_school = ['Licton Springs/Webster','North Beach Elementary','Broadview-Thomson', 'Green Lake Elementary','Decatur Elementary','Cedar Park Elementary','Laurelhurst Elementary', 'Catharine Blaine K-8','John Hay Elementary', 'McGilvra Elementary','Stevens Elementary',
                         'Thurgood Marshall Elementary', 'Orca/Whitworth', 'Graham Hill Elementary', 'Rainier View Elementary', 'Louisa Boren (STEM)', 'Sanislo Elementary']
 
