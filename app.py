@@ -299,12 +299,27 @@ def set_example_4():
     st.session_state.building_capacity = (0, 300)
     st.session_state.selected_options = ['School Type','Enrollment Total', 'Building Capacity']
 
+def set_proposed_option_a():
+    reset_all_states()
+    st.manual_school = ['Licton Springs/Webster', 'Monroe/Salmon Bay','North Beach Elementary', 'Broadview-Thomson','Green Lake Elementary','Decatur Elementary','Sacajawea Elementary','Cedar Park Elementary','Laurelhurst Elementary','Catharine Blaine K-8','John Hay Elementary',
+                        'McGilvra Elementary', 'Stevens Elementary', 'TOPS/Seward', 'Orca/Whitworth', 'Graham Hill Elementary', 'Dunlap Elementary', 'Rainier View Elementary', 'Lafayette Elementary', 'Louisa Boren (STEM)', 'Sanislo Elementary']
+    
+
+def set_proposed_option_b():
+    reset_all_states()
+    st.manual_school = ['Licton Springs/Webster','North Beach Elementary','Broadview-Thomson', 'Green Lake Elementary','Decatur Elementary','Cedar Park Elementary','Laurelhurst Elementary', 'Catharine Blaine K-8','John Hay Elementary', 'McGilvra Elementary','Stevens Elementary',
+                        'Thurgood Marshall Elementary', 'Orca/Whitworth', 'Graham Hill Elementary', 'Rainier View Elementary', 'Louisa Boren (STEM)', 'Sanislo Elementary']
+
 st.sidebar.write("")
 st.sidebar.write("")
 st.sidebar.write("")
 st.sidebar.write("")
 st.sidebar.write("")
 st.sidebar.header('Explore using Pre-Loaded Examples Below:')
+st.sidebar.write("<h5>Proposed Option A (21 Closing)</h5>", unsafe_allow_html=True)
+la = st.sidebar.button('Load Proposed Option A', key='example_a', on_click=set_proposed_option_a)
+st.sidebar.write("<h5>Proposed Option B (17 Closing)</h5>", unsafe_allow_html=True)
+lb = st.sidebar.button('Load Proposed Option B', key='example_b', on_click=set_proposed_option_b)
 st.sidebar.write("<h5>Schools with Enrollment < 300 and Capacity < 75%</h5>", unsafe_allow_html=True)
 l1 = st.sidebar.button('Load Example 1', key='example_1', on_click=set_example_1)
 st.sidebar.write("")
