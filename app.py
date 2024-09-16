@@ -301,14 +301,14 @@ def set_example_4():
 
 def set_proposed_option_a():
     reset_all_states()
-    st.manual_school = ['Licton Springs/Webster', 'Monroe/Salmon Bay','North Beach Elementary', 'Broadview-Thomson','Green Lake Elementary','Decatur Elementary','Sacajawea Elementary','Cedar Park Elementary','Laurelhurst Elementary','Catharine Blaine K-8','John Hay Elementary',
+    st.session_state.manual_school = ['Licton Springs/Webster', 'Monroe/Salmon Bay','North Beach Elementary', 'Broadview-Thomson','Green Lake Elementary','Decatur Elementary','Sacajawea Elementary','Cedar Park Elementary','Laurelhurst Elementary','Catharine Blaine K-8','John Hay Elementary',
                         'McGilvra Elementary', 'Stevens Elementary', 'TOPS/Seward', 'Orca/Whitworth', 'Graham Hill Elementary', 'Dunlap Elementary', 'Rainier View Elementary', 'Lafayette Elementary', 'Louisa Boren (STEM)', 'Sanislo Elementary']
     
 
 def set_proposed_option_b():
     reset_all_states()
-    st.session_state.school_type = []
-    st.manual_school = ['Licton Springs/Webster','North Beach Elementary','Broadview-Thomson', 'Green Lake Elementary','Decatur Elementary','Cedar Park Elementary','Laurelhurst Elementary', 'Catharine Blaine K-8','John Hay Elementary', 'McGilvra Elementary','Stevens Elementary',
+    st.session_state.enrollment_range = (0, 0)
+    st.session_state.manual_school = ['Licton Springs/Webster','North Beach Elementary','Broadview-Thomson', 'Green Lake Elementary','Decatur Elementary','Cedar Park Elementary','Laurelhurst Elementary', 'Catharine Blaine K-8','John Hay Elementary', 'McGilvra Elementary','Stevens Elementary',
                         'Thurgood Marshall Elementary', 'Orca/Whitworth', 'Graham Hill Elementary', 'Rainier View Elementary', 'Louisa Boren (STEM)', 'Sanislo Elementary']
 
 st.sidebar.write("")
