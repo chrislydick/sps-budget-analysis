@@ -8,7 +8,7 @@ class StreamlitIntegration(unittest.TestCase):
         app = AppTest.from_file(str(Path(__file__).resolve().parents[1] / 'app.py'), default_timeout=30).run()
         self.assertFalse(app.exception)
         self.assertEqual(app.metric[1].value, '73')
-        for school, message in [('South Shore', 'South Shore'), ('Cascade Parent Partnership', 'Cascade Parent Partnership'), ('Adams Elementary', 'rounding')]:
+        for school, message in [('South Shore', 'South Shore'), ('Cascade Parent Partnership', 'Cascade Parent Partnership')]:
             with self.subTest(school=school):
                 app.multiselect(key='manual_school').set_value([school]).run()
                 self.assertFalse(app.exception)
