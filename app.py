@@ -8,6 +8,7 @@ import numpy as np
 import shutil
 from bs4 import BeautifulSoup
 import pathlib
+from allocation_checks import AllocationDataError, validate_destinations, validate_totals
 
 
 
@@ -65,8 +66,9 @@ def reallocate_student_counts(student_counts, redistribution_matrix, closed_scho
                 redistribution_percentages[list(closed_schools)] = 0
                 total_percentage = np.sum(redistribution_percentages)
                 
-                if total_percentage > 0:
-                    redistribution_percentages /= total_percentage
+                if total_percentage <= 0:
+                    raise AllocationDataError("A selected closure has no supported open-school destination. No estimate is shown.")
+                redistribution_percentages /= total_percentage
                 
                 for i in range(num_schools):
                     if i not in closed_schools:
@@ -370,11 +372,20 @@ filtered_data = data[((data['Landmark'].isin(selected_landmark)) &
 # Main panel
 
 
-before = reallocate_student_counts(counts, matrix, [])
 closed_schools = pd.array(filtered_data.index)
-after = reallocate_student_counts(counts, matrix, closed_schools)
-data['Enrollment from Redistribution'] = (after-before).astype(int)
-data['Total Enrollment'] = (data['Total AAFTE* Enrollment (ENROLLMENT)'] + data['Enrollment from Redistribution']).astype(int)
+try:
+    validate_destinations(counts, matrix.to_numpy(), closed_schools, data['School'].tolist())
+    before = reallocate_student_counts(counts, matrix, [])
+    after = reallocate_student_counts(counts, matrix, closed_schools)
+    changes = (after-before).astype(int)
+    totals = (data['Total AAFTE* Enrollment (ENROLLMENT)'] + changes).astype(int)
+    validate_totals(before, after, totals, closed_schools)
+except AllocationDataError as error:
+    st.error(str(error))
+    st.info('Adjust the closure selection in the sidebar. Source data uses 2023 enrollment; no replacement destinations or student assignments have been assumed.')
+    st.stop()
+data['Enrollment from Redistribution'] = changes
+data['Total Enrollment'] = totals
 data['Redistribution Capacity'] = (data['Total Enrollment'] / data['Capacity']).astype(float)
 
 st.title('Simulation of School Closures in Seattle Public Schools 2025+')

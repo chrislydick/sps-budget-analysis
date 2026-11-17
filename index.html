@@ -4,27 +4,43 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>My App</title>
+    <title>Seattle Public Schools Budget Analysis · 2023 data</title>
 
     <style>
     body {
       margin: 0;
+      font-family: system-ui, sans-serif;
+      color: #173c43;
+      background: #f7f7f2;
     }
 
     iframe {
       display: block;
       background: #000;
       border: none;
-      height: 100vh;
-      width: 100vw;
+      height: 80vh;
+      height: 80dvh;
+      min-height: 360px;
+      width: 100%;
     }
+    header { padding: 1rem; max-width: 75rem; margin: auto; }
+    h1 { font-size: 1.35rem; margin: 0 0 .5rem; }
+    a { color: #075a76; text-underline-offset: .2em; }
+    a:focus-visible { outline: 3px solid #075a76; outline-offset: 4px; }
     </style>
 
   </head>
   <body>
-    <iframe src="https://share.streamlit.io/chrislydick/sps-budget-analysis/main/app.py">
-        Your browser doesn't support iframes
-    </iframe>
+    <header>
+      <h1>Seattle Public Schools Budget Analysis</h1>
+      <p>Historical scenario explorer using 2023 data. These scenarios are not a current enrollment forecast or a recommendation to close schools.</p>
+      <p>If the embedded app is unavailable or asleep, <a href="https://sps-budget-analysis-2023.streamlit.app/" target="_blank" rel="noopener">open the analysis directly</a> to check or wake it. <a href="https://github.com/chrislydick/sps-budget-analysis">Read the methods and source data</a>.</p>
+    </header>
+    <main>
+      <iframe title="School budget and closure scenario explorer using 2023 data" src="https://sps-budget-analysis-2023.streamlit.app/?embed=true">
+        <a href="https://sps-budget-analysis-2023.streamlit.app/">Open the analysis directly</a>
+      </iframe>
+    </main>
 
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-WC85WK7KYB"></script>
