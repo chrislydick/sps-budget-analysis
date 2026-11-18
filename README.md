@@ -1,6 +1,8 @@
 # sps-budget-analysis
 Budget Analysis and data extraction from Seattle Public Schools Budget Documentation
 
+**Historical model:** Developed for the 2024 closure discussion using 2023 enrollment and budget data. Presets are historical scenarios, not current SPS proposals or approved closures.
+
 See [elementary_school_data_extract.ipynb](elementary_school_data_extract.ipynb) for details and draft analysis including K-Means clustering by enrollment, budget, and distance to nearest school.
 
 Streamlit app deployed publicly for analysis [here:](https://sps-budget-analysis-2023.streamlit.app/)
@@ -8,7 +10,7 @@ Streamlit app deployed publicly for analysis [here:](https://sps-budget-analysis
 Essentially this app: 
 1. Utilizes numerous collected sample points from various public sources
 2. Normalizes the names to provide consistency and opportunities to compare
-3. Uses linear regression to calculate a likely necessary budget given past performance
+3. Displays historical regression budget estimates from the source notebook; these are not assessed funding needs or projected closure savings
 4. Uses k-means to categorize schools into similar groups given numerous dimensions
 5. Simulates and redistributes student counts to other schools based on known relationships between attendance areas and schools
 6. Projects visually (and tabularly) what the anticipated outcome is for other schools, and their future capacities by taking on additional students.
@@ -21,7 +23,7 @@ Q1: Where did this data come from?
 A1: All of the data originated from PDFs available through the SPS public website. A number of scripts were developed in order to scrape this data accurately into a format which is usable, filterable, and one can interact with.
 
 Some additional data was created using standard methods fully disclosed within the Jupyter Lab notebook referenced above. These include: 
-* `Necessary Budget` which uses linear regression to calculate the predicted budget for each school using past years budget and enrollment numbers, 
+* `Predicted Total Budget (BUDGET)` is the stored regression prediction produced in the notebook using 2021/2022 records to predict 2023 budgets. `Excess Total Budget` and `Excess Budget per Student` are differences from that estimate, not evidence of unnecessary spending. The app does not refit this model or recompute budget fields after a simulated closure. The former `Necessary Budget` app-only field was actual budget plus an unexplained $500,000, not a regression output, and has been removed; the source data and stored predictions are unchanged.
 * `Distance to nearest School` which identifies the nearest school (E, K-8 or K-12) 'as the crow flies', 
 * `Budget Efficiency` which simply divides the total budget by the number of enrolled students, 
 * `Disadvantage Score` which is the sum of Bilingual Education Enrolled Students, Free and Reduced Lunch Students and Special Education Students divided by the total number of enrolled students, and

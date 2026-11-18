@@ -91,7 +91,8 @@ counts = data[['Total AAFTE* Enrollment (ENROLLMENT)']].transpose().values[0]
 
 # Clean data\
 data = data.rename(columns=lambda x: x.strip()).drop(columns=['Unnamed: 0'])
-data['Necessary Budget'] = 500000 + data['Total Budget (BUDGET)']
+# Preserve the historical regression prediction from the source CSV unchanged.
+# Do not invent a separate necessary budget by adding a fixed amount.
 data['Budget Efficiency'] = data['Total Budget (BUDGET)'] / data['Total AAFTE* Enrollment (ENROLLMENT)']
 data['Landmark'] = data['Landmark'].fillna('N')
 data['Building Condition Score'] = data['Building Condition Score'].fillna(0)
@@ -324,10 +325,10 @@ st.sidebar.write("")
 st.sidebar.write("")
 st.sidebar.write("")
 st.sidebar.header('Explore using Pre-Loaded Examples Below:')
-st.sidebar.write("<h5>Proposed Option A (21 Closing)</h5>", unsafe_allow_html=True)
-la = st.sidebar.button('Load Proposed Option A', key='example_a', on_click=set_proposed_option_a)
-st.sidebar.write("<h5>Proposed Option B (17 Closing)</h5>", unsafe_allow_html=True)
-lb = st.sidebar.button('Load Proposed Option B', key='example_b', on_click=set_proposed_option_b)
+st.sidebar.write("<h5>Historical Option A (21 Closing)</h5>", unsafe_allow_html=True)
+la = st.sidebar.button('Load Historical Option A', key='example_a', on_click=set_proposed_option_a)
+st.sidebar.write("<h5>Historical Option B (17 Closing)</h5>", unsafe_allow_html=True)
+lb = st.sidebar.button('Load Historical Option B', key='example_b', on_click=set_proposed_option_b)
 st.sidebar.write("<h5>Schools with Enrollment < 300 and Capacity < 75%</h5>", unsafe_allow_html=True)
 l1 = st.sidebar.button('Load Example 1', key='example_1', on_click=set_example_1)
 st.sidebar.write("")
@@ -389,10 +390,11 @@ data['Enrollment from Redistribution'] = changes
 data['Total Enrollment'] = totals
 data['Redistribution Capacity'] = (data['Total Enrollment'] / data['Capacity']).astype(float)
 
-st.title('Simulation of School Closures in Seattle Public Schools 2025+')
+st.title('Historical SPS School-Closure Simulator (2023 Data)')
 st.caption('Whole-student estimates preserve the 2023 source enrollment total: floor each open-school estimate, then assign remaining students to the largest fractional remainders. Exact ties use school name, then source row order. Closed schools remain at zero. This rounding does not add destinations or change redistribution weights; these are estimates, not individual student assignments.')
-#st.write('Seattle Public Schools (SPS) has initiated a program dubbed as <a href="https://www.seattleschools.org/resources/well-resourced-schools/">Well-Resourced Schools</a>, which began upon board approval for analysis of up to 20 elementary schools to be closed in Seattle. The hope is to close a growing budget gap in excess of $100M/year and increasing from years 2026+. This analysis utilizes <a href="https://github.com/chrislydick/sps-budget-analysis/tree/main/data">publicly available data</a> in order to understand outcomes of potential school closures. This data and analysis is provided for informational purposes only and is not intended to be a recommendation for or against any specific school closure. All code and data is available on <a href="https://github.com/chrislydick/sps-budget-analysis">GitHub here</a>.', unsafe_allow_html=True)
-st.write('Seattle Public Schools (SPS) has launched the <a href="https://www.seattleschools.org/resources/well-resourced-schools/">Well-Resourced Schools program</a> following board approval to analyze the potential closure of up to 20 elementary schools in Seattle. This initiative aims to address a budget shortfall exceeding $100 million annually, projected to increase from 2026 onward. The analysis <a href="https://github.com/chrislydick/sps-budget-analysis/tree/main/data">leverages publicly available data from SPS</a> to assess the potential outcomes of school closures. The data and analysis are provided for informational purposes only and do not constitute recommendations for or against any specific school closure. All code and data can be accessed <a href="https://github.com/chrislydick/sps-budget-analysis">here</a>. Author Information <a href="https://chrislydick.com">here</a>. Contribute to the project <a href="https://github.com/chrislydick/sps-budget-analysis/tree/main">here</a>. FAQ available <a href="https://github.com/chrislydick/sps-budget-analysis?tab=readme-ov-file#faq">here</a>. ', unsafe_allow_html=True)
+st.info('Historical exploration: this tool was developed for the 2024 school-closure discussion and uses 2023 enrollment and budget data. Preset options are historical scenarios, not current SPS proposals or approved closures.')
+st.write('Explore hypothetical school closures using <a href="https://github.com/chrislydick/sps-budget-analysis/tree/main/data">public source data</a>. This is an independent community model, not an SPS forecast, recommendation, or current policy statement. Read the <a href="https://github.com/chrislydick/sps-budget-analysis#faq">assumptions and FAQ</a> and inspect the <a href="https://github.com/chrislydick/sps-budget-analysis">code</a>. Author information is available <a href="https://chrislydick.com">here</a>.', unsafe_allow_html=True)
+st.caption('Budget fields describe the historical source data. Predicted Total Budget (BUDGET) is a stored regression estimate, not an assessed funding need or closure saving. Excess budget fields are differences from that estimate, not demonstrated waste. These budget values do not recalculate when students are redistributed.')
 st.write('Start by selecting some number of metrics, or adjusting the metrics already selected on the left. You can also explore some pre-loaded examples. ', unsafe_allow_html=True)
 st.write("")
 col1, col2, col3, col4, col5 = st.columns(5)
