@@ -5,6 +5,7 @@ import folium
 from streamlit_folium import st_folium
 from streamlit.components.v1 import html
 import numpy as np
+from capacity_metrics import capacity_summary
 import shutil
 from bs4 import BeautifulSoup
 import pathlib
@@ -401,113 +402,29 @@ col1, col2, col3, col4, col5 = st.columns(5)
 #col2, col3, col4, col5 = st.columns(4)
 
 
-s_under_75 = len(data[data['Redistribution Capacity'] < 0.75]) - len(filtered_data)
-s_under_75_delta = -1+len(data[data['Redistribution Capacity'] < 0.75])-len(data[data['Capacity Percent'] < 0.75])
-# First calculate number of schools which went into this category, then out. 
-
-
-
-data['delta < 75'] = np.where(  
-                                (round(100*data['Redistribution Capacity'],0) != round(100*data['Capacity Percent'],0)) & \
-                                (round(100*data['Capacity Percent'],0) < 75) &\
-                                (round(100*data['Redistribution Capacity'],0) == 0),\
-                                'out','')
-
-data['delta < 75'] = np.where(  
-                                (round(100*data['Redistribution Capacity'],0) != round(100*data['Capacity Percent'],0)) & \
-                                (round(100*data['Capacity Percent'],0) <= 75) & \
-                                (round(100*data['Redistribution Capacity'],0) >= 75), \
-                                'out', data['delta < 75'])
-
-
-
-
-
-data['delta 75-100'] = np.where(
-                                (round(100*data['Redistribution Capacity'],0) != round(100*data['Capacity Percent'],0)) & \
-                                (round(100*data['Capacity Percent'],0) >= 75) & \
-                                (round(100*data['Capacity Percent'],0) <= 100) & \
-                                (round(100*data['Redistribution Capacity'],0) == 0), \
-                                'out','')
-
-data['delta 75-100'] = np.where(
-                                (round(100*data['Redistribution Capacity'],0) != round(100*data['Capacity Percent'],0)) & \
-                                (round(100*data['Capacity Percent'],0) >= 75) & \
-                                (round(100*data['Capacity Percent'],0) <= 100) & \
-                                (round(100*data['Redistribution Capacity'],0) > 100), \
-                                'out',data['delta 75-100'])
-
-data['delta 75-100'] = np.where(
-                                (round(100*data['Redistribution Capacity'],0) != round(100*data['Capacity Percent'],0)) & \
-                                (round(100*data['Capacity Percent'],0) >= 75) & \
-                                (round(100*data['Capacity Percent'],0) <= 100) & \
-                                (round(100*data['Redistribution Capacity'],0) <= 75), \
-                                'out',data['delta 75-100'])
-
-data['delta 75-100'] = np.where(
-                                (round(100*data['Redistribution Capacity'],0) != round(100*data['Capacity Percent'],0)) & \
-                                (round(100*data['Capacity Percent'],0) <= 75) & \
-                                (round(100*data['Redistribution Capacity'],0) >= 75) & \
-                                (round(100*data['Redistribution Capacity'],0) <= 100), \
-                                'in',data['delta 75-100'])
-
-
-
-data['delta > 100'] = np.where(
-                                (round(100*data['Redistribution Capacity'],0) != round(100*data['Capacity Percent'],0)) & \
-                                (round(100*data['Capacity Percent'],0) >= 100) & \
-                                (round(100*data['Redistribution Capacity'],0) == 0),\
-                                'out','')
-
-data['delta > 100'] = np.where(
-                                (round(100*data['Redistribution Capacity'],0) != round(100*data['Capacity Percent'],0)) & \
-                                (round(100*data['Capacity Percent'],0) <= 100) & \
-                                (round(100*data['Redistribution Capacity'],0) > 100),\
-                                'in',data['delta > 100'])
-
-data['delta closed'] = np.where((data['Redistribution Capacity'] == 0), 'in','')
-
-
-s_over_100 = len(data[data['Redistribution Capacity'] > 1.0])
-s_over_100_delta = len(data[data['Redistribution Capacity'] > 1.0])-len(data[data['Capacity Percent'] > 1.0])
-s_remaining = len(data) - s_over_100 - s_under_75 - len(filtered_data)
-#s_remaining_delta = abs(s_over_100 - s_under_75)
-# 
-s_remaining_delta = -1 + (len(data.query('`Capacity Percent` >= 0.75 & `Capacity Percent` <= 1.0')))\
-                    - len(data.query('`Redistribution Capacity` >= 0.75 & `Redistribution Capacity` <= 1.0 ')) - len(filtered_data)
+# Counts and deltas use identical unrounded enrollment/capacity categories.
+# Explicit closure selections are excluded; a zero-enrollment open school is not closed.
+capacity_counts, capacity_deltas, capacity_transitions = capacity_summary(
+    before, totals, data['Capacity'].to_numpy(), closed_schools)
+for column, values in capacity_transitions.items():
+    data[column] = values
+st.caption('Capacity categories use unrounded enrollment divided by capacity: below 75%, 75% through 100% inclusive, and above 100%. Closed schools are excluded from all three counts; each delta is the change from the no-closure baseline.')
 
 if filtered_data['Total AAFTE* Enrollment (ENROLLMENT)'].sum() == 0:
     col1.metric("Students' Assignments Unchanged*", f"{data['Total AAFTE* Enrollment (ENROLLMENT)'].sum() - filtered_data['Total AAFTE* Enrollment (ENROLLMENT)'].sum():,.0f}", delta=f"{filtered_data['Total AAFTE* Enrollment (ENROLLMENT)'].sum():,.0f}", delta_color="off")
 else: 
     col1.metric("Students' Assignments Unchanged*", f"{data['Total AAFTE* Enrollment (ENROLLMENT)'].sum() - filtered_data['Total AAFTE* Enrollment (ENROLLMENT)'].sum():,.0f}", delta=f"-{filtered_data['Total AAFTE* Enrollment (ENROLLMENT)'].sum():,.0f}")
 
-if len(data[data['delta closed']=='in']) == 0:
-    col2.metric('Schools Remaining Open', f"{len(data) - len(filtered_data)}", delta=f"{-len(data[data['delta closed']=='in'])}", delta_color="off")
-else: 
-    col2.metric('Schools Remaining Open', f"{len(data) - len(filtered_data)}", delta=f"{-len(data[data['delta closed']=='in'])}", delta_color="inverse")
-if len(data[data['delta < 75']=='in'])-len(data[data['delta < 75']=='out']) == 0:
-    col3.metric('Schools Under 75% Capacity', f"{s_under_75}", delta=f"{len(data[data['delta < 75']=='in'])-len(data[data['delta < 75']=='out'])}", delta_color="off")
-else: 
-    col3.metric('Schools Under 75% Capacity', f"{s_under_75}", delta=f"{len(data[data['delta < 75']=='in'])-len(data[data['delta < 75']=='out'])}", delta_color="inverse")
-
-if len(data[data['delta 75-100']=='in'])-len(data[data['delta 75-100']=='out']) == 0:
-    col4.metric('Schools Between 75-100% Capacity', f"{s_remaining}", delta=f"{len(data[data['delta 75-100']=='in'])-len(data[data['delta 75-100']=='out'])}", delta_color="off")
-else: 
-    col4.metric('Schools Between 75-100% Capacity', f"{s_remaining}", delta=f"{len(data[data['delta 75-100']=='in'])-len(data[data['delta 75-100']=='out'])}", delta_color="normal")
-
-if len(data[data['delta > 100']=='in'])-len(data[data['delta > 100']=='out']) == 0:
-    col5.metric('Schools Over 100% Capacity', f"{s_over_100}", delta=f"{len(data[data['delta > 100']=='in'])-len(data[data['delta > 100']=='out'])}", delta_color="off")
-else: 
-    col5.metric('Schools Over 100% Capacity', f"{s_over_100}", delta=f"{len(data[data['delta > 100']=='in'])-len(data[data['delta > 100']=='out'])}", delta_color="inverse")
-
-
-#col2.metric('Schools Remaining Open', f"{len(data) - len(filtered_data)}", delta=f"-{len(filtered_data)}", delta_color="inverse")
-#col3.metric('Schools Under 75% Capacity', f"{s_under_75}", delta=f"{s_under_75_delta}", delta_color="inverse")
-#col4.metric('Schools Between 75-100% Capacity', f"{s_remaining}", delta=f"{s_remaining_delta}")
-#col5.metric('Schools Over 100% Capacity', f"{s_over_100}", delta=f"{s_over_100_delta}", delta_color="inverse")
-
-
-
+col2.metric('Schools Remaining Open', f"{len(data) - len(closed_schools)}",
+            delta=f"{-len(closed_schools)}", delta_color='off' if len(closed_schools) == 0 else 'inverse')
+for column, bucket, label, color in [
+    (col3, '< 75', 'Schools Under 75% Capacity', 'inverse'),
+    (col4, '75-100', 'Schools Between 75-100% Capacity', 'normal'),
+    (col5, '> 100', 'Schools Over 100% Capacity', 'inverse'),
+]:
+    delta = capacity_deltas[bucket]
+    column.metric(label, str(capacity_counts[bucket]), delta=str(delta),
+                  delta_color='off' if delta == 0 else color)
 
 #identify all column names beginning with 'Cluster_'
 cluster_columns = [col for col in data.columns if 'Cluster_' in col]
